@@ -3,134 +3,233 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Meta Ads — Arena Publicidade</title>
+<title>Arena — Hub de Marketing IA</title>
 <style>
-  :root {
-    --bg: #090909; --surf: #0f0f0f; --brd: #1c1c1c;
-    --txt: #ebe7e1; --dim: #555; --acc: #d4956a;
-    --green: #5bad85; --red: #e07070; --blue: #6a8eb5; --purple: #9b7dbf;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--txt); font-family: Georgia, serif; font-size: 14px; }
-  input, select { background: var(--surf); border: 1px solid var(--brd); color: var(--txt);
-    padding: 8px 12px; border-radius: 6px; font-size: 12px; outline: none; font-family: monospace; }
-  input:focus, select:focus { border-color: var(--acc); }
-  button { cursor: pointer; font-family: Georgia, serif; font-weight: 600; border: none;
-    border-radius: 6px; transition: opacity .15s; }
-  button:hover:not(:disabled) { opacity: .8; }
-  button:disabled { cursor: not-allowed; opacity: .4; }
-  ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
-  select option { background: #111; }
+:root {
+  --bg: #090909; --surf: #0f0f0f; --brd: #1c1c1c;
+  --txt: #ebe7e1; --dim: #555; --acc: #d4956a;
+  --green: #5bad85; --red: #e07070; --blue: #6a8eb5; --purple: #9b7dbf;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--txt); font-family: Georgia, serif; font-size: 14px; min-height: 100vh; }
+input, select, textarea {
+  background: var(--surf); border: 1px solid var(--brd); color: var(--txt);
+  padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none;
+  font-family: Georgia, serif; width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--acc); }
+textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+button { cursor: pointer; font-family: Georgia, serif; font-weight: 600; border: none; border-radius: 6px; transition: opacity .15s; }
+button:hover:not(:disabled) { opacity: .8; }
+button:disabled { cursor: not-allowed; opacity: .4; }
+select option { background: #111; }
+::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
 
-  /* LAYOUT */
-  #header { border-bottom: 1px solid var(--brd); padding: 14px 24px;
-    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  #header-left .sub { font-size: 10px; letter-spacing: .35em; color: #2e2e2e; margin-bottom: 2px; text-transform: uppercase; }
-  #header-left .title { font-size: 18px; font-weight: 400; }
-  #header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  #main { max-width: 980px; margin: 0 auto; padding: 24px 20px; }
+/* HEADER */
+#header {
+  border-bottom: 1px solid var(--brd); padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 100; background: var(--bg);
+}
+#header-left .sub { font-size: 10px; letter-spacing: .35em; color: #2e2e2e; margin-bottom: 1px; text-transform: uppercase; }
+#header-left .title { font-size: 17px; font-weight: 400; }
+#header-center select { width: 200px; font-size: 13px; }
+#header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-  /* CARDS */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
-  .grid-sm { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-bottom: 14px; }
-  .mcard { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; }
-  .mcard .lbl { font-size: 10px; letter-spacing: .18em; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
-  .mcard .val { font-size: 20px; font-weight: 600; font-family: monospace; }
-  .mcard .sub { font-size: 11px; color: #444; margin-top: 3px; }
-  .kv { padding: 8px 12px; background: var(--surf); border: 1px solid var(--brd); border-radius: 6px;
-    display: flex; justify-content: space-between; align-items: center; }
-  .kv .k { font-size: 11.5px; color: var(--dim); }
-  .kv .v { font-size: 11.5px; font-family: monospace; }
+/* TAB NAV */
+#tab-nav {
+  display: flex; gap: 2px; padding: 0 24px;
+  border-bottom: 1px solid var(--brd); background: var(--bg);
+  position: sticky; top: 57px; z-index: 99; overflow-x: auto;
+}
+.tab-btn {
+  padding: 10px 16px; background: none; color: var(--dim);
+  font-size: 12px; letter-spacing: .1em; border-radius: 0;
+  border-bottom: 2px solid transparent; white-space: nowrap;
+  transition: color .15s, border-color .15s;
+}
+.tab-btn:hover { color: var(--txt); opacity: 1; }
+.tab-btn.active { color: var(--acc); border-bottom-color: var(--acc); }
 
-  /* SECTION */
-  .section-head { display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 0; border-bottom: 1px solid var(--brd); cursor: pointer; user-select: none; margin-bottom: 14px; }
-  .section-head span { font-size: 11px; letter-spacing: .2em; color: #888; text-transform: uppercase; }
-  .section-head .arrow { color: #333; font-size: 12px; }
+/* PANELS */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+#main { max-width: 960px; margin: 0 auto; padding: 28px 20px; }
 
-  /* BADGE */
-  .badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-family: monospace; white-space: nowrap; }
-  .badge-ACTIVE   { background:#5bad8520; border:1px solid #5bad8540; color:#5bad85; }
-  .badge-PAUSED   { background:#d4956a20; border:1px solid #d4956a40; color:#d4956a; }
-  .badge-ARCHIVED { background:#55555520; border:1px solid #55555540; color:#555; }
+/* FORM */
+.form-label { font-size: 10px; letter-spacing: .2em; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; display: block; }
+.form-group { margin-bottom: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 
-  /* CAMPAIGN CARD */
-  .camp-card { margin-bottom: 10px; background: var(--surf); border: 1px solid var(--brd);
-    border-radius: 8px; padding: 14px 16px; }
-  .camp-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-  .camp-name { font-size: 13.5px; color: var(--txt); margin-bottom: 4px; line-height: 1.3; }
-  .camp-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .camp-spend { font-size: 16px; color: var(--acc); font-family: monospace; font-weight: 600; flex-shrink: 0; }
-  .mini-grid { display: flex; gap: 6px; flex-wrap: wrap; }
-  .mini-cell { padding: 4px 8px; background: #0d0d0d; border: 1px solid #181818; border-radius: 4px; }
-  .mini-cell .mk { font-size: 9.5px; color: #3a3a3a; }
-  .mini-cell .mv { font-size: 12px; font-family: monospace; }
+/* CARD */
+.card { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 16px 18px; margin-bottom: 10px; }
+.card-title { font-size: 13px; margin-bottom: 12px; color: var(--txt); }
 
-  /* AD CARD */
-  .ad-card { margin-bottom: 8px; background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 12px 14px; }
-  .ad-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--brd); flex-shrink: 0; }
-  .ad-row { display: flex; gap: 12px; }
-  .cta-tag { margin-top: 4px; display: inline-block; font-size: 10px; padding: 2px 7px;
-    background: #6a9e8e20; border: 1px solid #6a9e8e40; border-radius: 3px; color: #6a9e8e; font-family: monospace; }
+/* PIPELINE */
+.pipeline-nodes {
+  display: flex; align-items: center; gap: 0; margin: 16px 0 24px;
+  flex-wrap: wrap; row-gap: 8px;
+}
+.p-node {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 20px; font-size: 12px;
+  border: 1px solid var(--brd); background: var(--surf); color: var(--dim);
+  transition: all .3s; white-space: nowrap;
+}
+.p-node.running { border-color: var(--acc); color: var(--acc); background: #1a110a; }
+.p-node.done { border-color: #5bad8560; color: var(--green); background: #0a130f; }
+.p-node.error { border-color: #e0707060; color: var(--red); background: #130a0a; }
+.p-arrow { color: #2a2a2a; margin: 0 4px; font-size: 12px; }
+.p-node-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
-  /* AUDIENCE */
-  .aud-row { margin-bottom: 6px; padding: 10px 14px; background: var(--surf); border: 1px solid var(--brd);
-    border-radius: 7px; display: flex; justify-content: space-between; align-items: center; }
+.agent-result {
+  border: 1px solid var(--brd); border-radius: 8px;
+  margin-bottom: 10px; overflow: hidden;
+}
+.agent-result-head {
+  padding: 10px 14px; background: #0d0d0d;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none;
+}
+.agent-result-head .agent-name { font-size: 11px; letter-spacing: .15em; color: #888; text-transform: uppercase; }
+.agent-result-body { padding: 16px 18px; font-size: 13px; line-height: 1.7; color: #b8b4ae; white-space: pre-wrap; }
+.agent-result-body strong { color: var(--txt); }
 
-  /* PIXEL */
-  .pixel-row { padding: 12px 14px; background: var(--surf); border: 1px solid var(--brd);
-    border-radius: 8px; display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
+/* COPY CARDS */
+.copy-card {
+  background: var(--surf); border: 1px solid var(--brd); border-radius: 8px;
+  padding: 16px 18px; margin-bottom: 10px;
+}
+.copy-card .copy-var { font-size: 10px; letter-spacing: .2em; color: var(--acc); text-transform: uppercase; margin-bottom: 10px; }
+.copy-field { margin-bottom: 8px; }
+.copy-field .ck { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .15em; margin-bottom: 2px; }
+.copy-field .cv { font-size: 13px; line-height: 1.5; color: var(--txt); }
+.copy-actions { display: flex; gap: 8px; margin-top: 12px; }
+.btn-copy { padding: 5px 12px; background: #161616; border: 1px solid #222; color: var(--dim); font-size: 11px; }
+.btn-copy:hover { color: var(--txt); }
 
-  /* ERROR */
-  .error-box { padding: 14px 16px; background: #130707; border: 1px solid #3a1010;
-    border-radius: 8px; color: var(--red); font-size: 13px; margin-bottom: 20px; }
-  .error-box small { display: block; margin-top: 6px; font-size: 11px; color: #854040; }
+/* METRICS */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.grid-sm { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-bottom: 14px; }
+.mcard { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; }
+.mcard .lbl { font-size: 10px; letter-spacing: .18em; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
+.mcard .val { font-size: 20px; font-weight: 600; font-family: monospace; }
+.mcard .sub { font-size: 11px; color: #444; margin-top: 3px; }
+.kv { padding: 8px 12px; background: var(--surf); border: 1px solid var(--brd); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+.kv .k { font-size: 11.5px; color: var(--dim); }
+.kv .v { font-size: 11.5px; font-family: monospace; }
 
-  /* LOADING */
-  #loading { text-align: center; padding: 60px 20px; color: var(--dim); }
-  #loading .icon { font-size: 28px; margin-bottom: 12px; animation: pulse 1.5s infinite; }
+/* SECTION */
+.section-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--brd); cursor: pointer; user-select: none; margin-bottom: 14px; }
+.section-head span { font-size: 11px; letter-spacing: .2em; color: #888; text-transform: uppercase; }
+.section-head .arrow { color: #333; font-size: 12px; }
+.section-body { margin-bottom: 24px; }
 
-  /* PROGRESS BAR */
-  #progress-wrap { background: #0f0f0f; border: 1px solid #1c1c1c; border-radius: 7px; padding: 14px 16px; margin-bottom: 20px; }
-  #progress-bar-track { height: 2px; background: #1c1c1c; border-radius: 1px; margin-top: 8px; }
-  #progress-bar { height: 100%; border-radius: 1px; background: linear-gradient(90deg, var(--acc), var(--purple)); width: 0%; transition: width .5s ease; }
-  #progress-label { font-size: 11px; font-family: monospace; color: var(--dim); }
+/* BADGE */
+.badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-family: monospace; white-space: nowrap; }
+.badge-ACTIVE   { background:#5bad8520; border:1px solid #5bad8540; color:#5bad85; }
+.badge-PAUSED   { background:#d4956a20; border:1px solid #d4956a40; color:#d4956a; }
+.badge-ARCHIVED { background:#55555520; border:1px solid #55555540; color:#555; }
 
-  /* CONFIG */
-  #config { margin-top: 24px; border: 1px solid var(--brd); border-radius: 8px; overflow: hidden; }
-  #config summary { padding: 10px 14px; cursor: pointer; font-size: 11px; color: #2a2a2a;
-    font-family: monospace; user-select: none; list-style: none; }
-  #config-body { padding: 14px; border-top: 1px solid var(--brd); display: flex; flex-direction: column; gap: 10px; }
-  .config-field label { display: block; font-size: 10px; color: var(--dim); letter-spacing: .15em;
-    text-transform: uppercase; margin-bottom: 4px; }
-  .config-field input { width: 100%; }
+/* CAMPAIGN CARD */
+.camp-card { margin-bottom: 10px; background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; }
+.camp-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.camp-name { font-size: 13.5px; color: var(--txt); margin-bottom: 4px; line-height: 1.3; }
+.camp-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.camp-spend { font-size: 16px; color: var(--acc); font-family: monospace; font-weight: 600; flex-shrink: 0; }
+.mini-grid { display: flex; gap: 6px; flex-wrap: wrap; }
+.mini-cell { padding: 4px 8px; background: #0d0d0d; border: 1px solid #181818; border-radius: 4px; }
+.mini-cell .mk { font-size: 9.5px; color: #3a3a3a; }
+.mini-cell .mv { font-size: 12px; font-family: monospace; }
+.camp-ai-btn { padding: 5px 12px; background: #12100e; border: 1px solid #2a1f14; color: var(--acc); font-size: 11px; font-family: monospace; border-radius: 4px; flex-shrink: 0; }
+.camp-ai-result { margin-top: 12px; padding: 14px; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 6px; font-size: 12.5px; line-height: 1.7; color: #a8a4a0; white-space: pre-wrap; display: none; }
+.camp-ai-result strong { color: var(--txt); }
 
-  /* TOP PERFORMERS */
-  .top-bar { background: #0d0d0d; border-radius: 4px; overflow: hidden; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; padding: 6px 8px; }
-  .top-fill { height: 4px; border-radius: 2px; background: var(--acc); }
+/* AD CARD */
+.ad-card { margin-bottom: 8px; background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 12px 14px; }
+.ad-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--brd); flex-shrink: 0; }
+.ad-row { display: flex; gap: 12px; }
+.cta-tag { margin-top: 4px; display: inline-block; font-size: 10px; padding: 2px 7px; background: #6a9e8e20; border: 1px solid #6a9e8e40; border-radius: 3px; color: #6a9e8e; font-family: monospace; }
+.aud-row { margin-bottom: 6px; padding: 10px 14px; background: var(--surf); border: 1px solid var(--brd); border-radius: 7px; display: flex; justify-content: space-between; align-items: center; }
+.pixel-row { padding: 12px 14px; background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
 
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-  .fade { animation: fadeIn .35s ease; }
+/* ERROR / LOADING */
+.error-box { padding: 14px 16px; background: #130707; border: 1px solid #3a1010; border-radius: 8px; color: var(--red); font-size: 13px; margin-bottom: 20px; }
+.error-box small { display: block; margin-top: 6px; font-size: 11px; color: #854040; }
+#loading { text-align: center; padding: 60px 20px; color: var(--dim); }
+#loading .icon { font-size: 28px; margin-bottom: 12px; animation: pulse 1.5s infinite; }
+#progress-wrap { background: #0f0f0f; border: 1px solid #1c1c1c; border-radius: 7px; padding: 14px 16px; margin-bottom: 20px; }
+#progress-bar-track { height: 2px; background: #1c1c1c; border-radius: 1px; margin-top: 8px; }
+#progress-bar { height: 100%; border-radius: 1px; background: linear-gradient(90deg, var(--acc), var(--purple)); width: 0%; transition: width .5s ease; }
+#progress-label { font-size: 11px; font-family: monospace; color: var(--dim); }
 
-  .hidden { display: none !important; }
-  .tag { font-size: 10px; padding: 1px 6px; background: #161616; border: 1px solid #1e1e1e; border-radius: 3px; color: #555; }
-  .section-body { margin-bottom: 24px; }
-  .dots { display: flex; gap: 4px; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brd); transition: all .3s; }
+/* HISTORY */
+.hist-item { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+.hist-item:hover { border-color: #2a2a2a; }
+.hist-type { font-size: 10px; padding: 2px 8px; border-radius: 3px; font-family: monospace; background: #161616; border: 1px solid #222; color: var(--dim); }
+.hist-title { font-size: 13px; flex: 1; }
+.hist-date { font-size: 11px; color: var(--dim); font-family: monospace; }
+.hist-del { padding: 4px 8px; background: none; border: 1px solid #2a1010; color: #6b3030; font-size: 11px; }
+
+/* PROFILES */
+.profile-card { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 16px 18px; margin-bottom: 10px; }
+.profile-name { font-size: 15px; margin-bottom: 4px; }
+.profile-meta { font-size: 12px; color: var(--dim); margin-bottom: 12px; }
+.profile-actions { display: flex; gap: 8px; }
+.btn-edit { padding: 6px 14px; background: #161616; border: 1px solid #222; color: var(--dim); font-size: 12px; }
+.btn-del { padding: 6px 14px; background: #130707; border: 1px solid #2a1010; color: #6b3030; font-size: 12px; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: #000000cc; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: var(--bg); border: 1px solid var(--brd); border-radius: 10px; padding: 24px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+.modal h3 { font-size: 15px; font-weight: 400; margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+/* AI LOADING */
+.ai-loading { display: flex; align-items: center; gap: 10px; padding: 16px; color: var(--dim); font-size: 13px; }
+.ai-spinner { width: 16px; height: 16px; border: 2px solid #222; border-top-color: var(--acc); border-radius: 50%; animation: spin .7s linear infinite; }
+
+/* TONE BOX */
+.tone-box { padding: 10px 14px; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 6px; font-size: 12px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+.tone-box strong { color: var(--acc); }
+
+/* SECTION DIVIDER */
+.section-divider { font-size: 10px; letter-spacing: .3em; color: #2a2a2a; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #141414; }
+
+/* MISC */
+.tag { font-size: 10px; padding: 1px 6px; background: #161616; border: 1px solid #1e1e1e; border-radius: 3px; color: #555; }
+.dots { display: flex; gap: 4px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brd); transition: all .3s; }
+.hidden { display: none !important; }
+.btn-primary { padding: 10px 22px; background: var(--acc); color: #080808; font-size: 13px; }
+.btn-secondary { padding: 10px 22px; background: #161616; border: 1px solid var(--brd); color: var(--txt); font-size: 13px; }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--dim); }
+.empty-state .ei { font-size: 32px; margin-bottom: 12px; }
+.empty-state p { font-size: 13px; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+.fade { animation: fadeIn .35s ease; }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div id="header">
   <div id="header-left">
-    <div class="sub">META ADS · LIVE DATA</div>
-    <div class="title" id="acct-name">Conectando...</div>
+    <div class="sub">ARENA PUBLICIDADE · IA</div>
+    <div class="title">Hub de Marketing</div>
+  </div>
+  <div id="header-center">
+    <select id="client-select" onchange="onClientChange(this.value)">
+      <option value="">Selecionar cliente...</option>
+    </select>
   </div>
   <div id="header-right">
     <div class="dots" id="dot-row"></div>
-    <select id="date-preset">
+    <select id="date-preset" style="width:150px;">
       <option value="today">Hoje</option>
       <option value="yesterday">Ontem</option>
       <option value="last_7d">Últimos 7 dias</option>
@@ -139,11 +238,98 @@
       <option value="this_month">Este mês</option>
       <option value="last_month">Mês passado</option>
     </select>
-    <button id="btn-refresh" onclick="fetchAll()" style="padding:8px 16px;background:var(--acc);color:#080808;font-size:12px;">↻ Atualizar</button>
   </div>
 </div>
 
+<!-- TAB NAV -->
+<nav id="tab-nav">
+  <button class="tab-btn active" data-tab="pipeline" onclick="switchTab('pipeline')">🚀 Pipeline</button>
+  <button class="tab-btn" data-tab="rapido" onclick="switchTab('rapido')">⚡ Rápido</button>
+  <button class="tab-btn" data-tab="metricas" onclick="switchTab('metricas')">📊 Métricas</button>
+  <button class="tab-btn" data-tab="criativo" onclick="switchTab('criativo')">🎨 Criativo</button>
+  <button class="tab-btn" data-tab="historico" onclick="switchTab('historico')">📋 Histórico</button>
+  <button class="tab-btn" data-tab="perfis" onclick="switchTab('perfis')">⚙ Perfis</button>
+</nav>
+
+<!-- ──────────── PIPELINE ──────────── -->
+<div id="tab-pipeline" class="tab-panel active">
 <div id="main">
+  <div class="section-divider">PIPELINE COMPLETO — 5 AGENTES EM SEQUÊNCIA</div>
+  <div class="pipeline-nodes" id="pipeline-nodes"></div>
+  <div id="pipeline-tone" class="tone-box hidden"></div>
+  <div class="form-group">
+    <label class="form-label">PRODUTO / SERVIÇO / CAMPANHA *</label>
+    <textarea id="pipeline-input" placeholder="Ex: Kit Skin Complex Plus (vitamina C + colágeno + biotina), ticket R$197, foco em rejuvenescimento da pele em 30 dias..."></textarea>
+  </div>
+  <div class="form-row">
+    <div class="form-group" style="margin:0">
+      <label class="form-label">BUDGET DE MÍDIA</label>
+      <input id="pipeline-budget" placeholder="Ex: R$5-10k/mês"/>
+    </div>
+    <div class="form-group" style="margin:0">
+      <label class="form-label">OBJETIVO PRINCIPAL</label>
+      <select id="pipeline-objective">
+        <option value="">Selecione...</option>
+        <option value="vendas">Vendas / E-commerce</option>
+        <option value="leads">Geração de Leads</option>
+        <option value="trafego">Tráfego para site</option>
+        <option value="reconhecimento">Reconhecimento de marca</option>
+        <option value="mensagens">Mensagens / WhatsApp</option>
+      </select>
+    </div>
+  </div>
+  <button id="btn-pipeline" class="btn-primary" onclick="runPipeline()" style="width:100%;margin-bottom:28px;">🚀 Ativar Pipeline Completo</button>
+  <div id="pipeline-results"></div>
+</div>
+</div>
+
+<!-- ──────────── RÁPIDO ──────────── -->
+<div id="tab-rapido" class="tab-panel">
+<div id="main">
+  <div class="section-divider">GERADOR RÁPIDO DE COPIES</div>
+  <div id="rapido-tone" class="tone-box hidden"></div>
+  <div class="form-group">
+    <label class="form-label">PRODUTO / SERVIÇO</label>
+    <input id="rapido-produto" placeholder="Ex: Curso de confeitaria online, R$297"/>
+  </div>
+  <div class="form-row">
+    <div class="form-group" style="margin:0">
+      <label class="form-label">ÂNGULO PRINCIPAL</label>
+      <select id="rapido-angulo">
+        <option value="dor">Dor / Problema</option>
+        <option value="desejo">Desejo / Transformação</option>
+        <option value="prova">Prova Social / Resultado</option>
+        <option value="urgencia">Urgência / Escassez</option>
+        <option value="curiosidade">Curiosidade / Intriga</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0">
+      <label class="form-label">FORMATO</label>
+      <select id="rapido-formato">
+        <option value="feed">Feed (imagem/vídeo)</option>
+        <option value="stories">Stories</option>
+        <option value="reels">Reels</option>
+        <option value="carrossel">Carrossel</option>
+        <option value="todos">Todos os formatos</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">DETALHES ADICIONAIS (opcional)</label>
+    <textarea id="rapido-detalhes" style="min-height:70px;" placeholder="Público-alvo, oferta, benefício principal, CTA desejado..."></textarea>
+  </div>
+  <button id="btn-rapido" class="btn-primary" onclick="runRapido()" style="width:100%;margin-bottom:28px;">⚡ Gerar Copies Agora</button>
+  <div id="rapido-results"></div>
+</div>
+</div>
+
+<!-- ──────────── MÉTRICAS ──────────── -->
+<div id="tab-metricas" class="tab-panel">
+<div id="main">
+  <div id="metricas-no-client" class="empty-state hidden">
+    <div class="ei">📊</div>
+    <p>Selecione um cliente no topo ou configure o token abaixo para ver as métricas.</p>
+  </div>
   <div id="error-wrap" class="hidden"></div>
   <div id="loading">
     <div class="icon">⬡</div>
@@ -155,371 +341,140 @@
     <div id="progress-bar-track"><div id="progress-bar"></div></div>
   </div>
   <div id="content" class="hidden fade"></div>
-  <details id="config">
-    <summary>⚙ Configurar token / conta</summary>
-    <div id="config-body">
-      <div class="config-field"><label>Access Token</label><input id="cfg-token" placeholder="EAAK..." /></div>
-      <div class="config-field"><label>Ad Account ID</label><input id="cfg-act" placeholder="act_..." /></div>
-      <button onclick="applyConfig()" style="padding:8px 16px;background:var(--acc);color:#080808;font-size:12px;align-self:flex-start;">Conectar</button>
-    </div>
-  </details>
+  <!-- Campos ocultos para compatibilidade com app.js -->
+  <input type="hidden" id="cfg-token"/>
+  <input type="hidden" id="cfg-act"/>
+  <div style="margin-top:20px;padding:12px 14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:6px;font-size:12px;color:#333;">
+    ⚙ Para trocar de conta, vá em <strong style="color:#555;">Perfis</strong> e selecione outro cliente.
+  </div>
+</div>
 </div>
 
-<script>
-// ── CONFIG ────────────────────────────────────────────────────────────────
-const DEFAULT_TOKEN = "";
-const DEFAULT_ACT   = "act_604987865349440";
-const INSIGHT_FIELDS = "impressions,clicks,spend,reach,ctr,cpc,cpm,actions,cost_per_action_type,frequency";
+<!-- ──────────── CRIATIVO ──────────── -->
+<div id="tab-criativo" class="tab-panel">
+<div id="main">
+  <div class="section-divider">GERADOR DE BRIEF CRIATIVO</div>
+  <div id="criativo-tone" class="tone-box hidden"></div>
+  <div class="form-group">
+    <label class="form-label">PRODUTO / CAMPANHA</label>
+    <input id="criativo-produto" placeholder="Ex: Lançamento do curso de tráfego pago, R$997"/>
+  </div>
+  <div class="form-row">
+    <div class="form-group" style="margin:0">
+      <label class="form-label">OBJETIVO</label>
+      <select id="criativo-objetivo">
+        <option value="vendas">Vendas</option>
+        <option value="leads">Leads</option>
+        <option value="awareness">Reconhecimento</option>
+        <option value="engajamento">Engajamento</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0">
+      <label class="form-label">PÚBLICO-ALVO</label>
+      <input id="criativo-publico" placeholder="Ex: Mulheres 25-45, interessadas em beleza"/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">REFERÊNCIAS / CONTEXTO (opcional)</label>
+    <textarea id="criativo-contexto" style="min-height:70px;" placeholder="Concorrentes, referências visuais, cores da marca, restrições..."></textarea>
+  </div>
+  <button id="btn-criativo" class="btn-primary" onclick="runCriativo()" style="width:100%;margin-bottom:28px;">🎨 Gerar Brief Criativo</button>
+  <div id="criativo-results"></div>
+</div>
+</div>
 
-let TOKEN = localStorage.getItem("meta_token") || DEFAULT_TOKEN;
-let ACT   = localStorage.getItem("meta_act")   || DEFAULT_ACT;
-document.getElementById("cfg-token").value = TOKEN;
-document.getElementById("cfg-act").value   = ACT;
+<!-- ──────────── HISTÓRICO ──────────── -->
+<div id="tab-historico" class="tab-panel">
+<div id="main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div class="section-divider" style="margin:0;border:none;padding:0;">HISTÓRICO DE GERAÇÃO</div>
+    <button onclick="clearHistory()" style="padding:6px 14px;background:#130707;border:1px solid #2a1010;color:#6b3030;font-size:12px;">Limpar tudo</button>
+  </div>
+  <div id="historico-list"></div>
+</div>
+</div>
 
-function applyConfig() {
-  TOKEN = document.getElementById("cfg-token").value.trim();
-  ACT   = document.getElementById("cfg-act").value.trim();
-  localStorage.setItem("meta_token", TOKEN);
-  localStorage.setItem("meta_act", ACT);
-  fetchAll();
-}
+<!-- ──────────── PERFIS ──────────── -->
+<div id="tab-perfis" class="tab-panel">
+<div id="main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div class="section-divider" style="margin:0;border:none;padding:0;">CLIENTES E PERFIS</div>
+    <button onclick="openNewClientModal()" class="btn-primary" style="padding:8px 16px;font-size:12px;">+ Novo Cliente</button>
+  </div>
+  <div id="perfis-list"></div>
+</div>
+</div>
 
-// ── HELPERS ───────────────────────────────────────────────────────────────
-const fmtN  = (n,d=2) => n==null?"—":Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
-const fmtR  = (n) => n==null?"—":`R$ ${fmtN(n)}`;
-const fmtP  = (n) => n==null?"—":`${fmtN(n,1)}%`;
-const fmtI  = (n) => n==null?"—":Number(n).toLocaleString("pt-BR");
-
-function getAction(ins, type) {
-  const acts = ins?.data?.[0]?.actions;
-  if (!acts) return null;
-  const a = acts.find(x=>x.action_type===type);
-  return a ? Number(a.value) : null;
-}
-function getCPA(ins, type) {
-  const cpa = ins?.data?.[0]?.cost_per_action_type;
-  if (!cpa) return null;
-  const a = cpa.find(x=>x.action_type===type);
-  return a ? Number(a.value) : null;
-}
-function insVal(ins, key) {
-  const v = ins?.data?.[0]?.[key];
-  return v != null ? Number(v) : null;
-}
-function badge(status) {
-  const labels = {ACTIVE:"Ativo",PAUSED:"Pausado",ARCHIVED:"Arquivado",CAMPAIGN_PAUSED:"Camp. Pausada"};
-  return `<span class="badge badge-${status}">${labels[status]||status}</span>`;
-}
-function mcard(label, value, color, sub="") {
-  return `<div class="mcard"><div class="lbl">${label}</div><div class="val" style="color:${color}">${value}</div>${sub?`<div class="sub">${sub}</div>`:""}</div>`;
-}
-function miniCell(k, v) {
-  return `<div class="mini-cell"><div class="mk">${k}</div><div class="mv">${v}</div></div>`;
-}
-function sectionHead(id, title, count) {
-  return `<div class="section-head" onclick="toggleSection('${id}')"><span>${title}${count!=null?` <span style="color:#444">(${count})</span>`:""}</span><span class="arrow" id="arr-${id}">▼</span></div>`;
-}
-
-const openSections = {account:true, campaigns:true, adsets:false, ads:false, audiences:false, pixels:false};
-function toggleSection(id) {
-  openSections[id] = !openSections[id];
-  const body = document.getElementById(`sec-${id}`);
-  const arr  = document.getElementById(`arr-${id}`);
-  if (body) body.classList.toggle("hidden", !openSections[id]);
-  if (arr)  arr.textContent = openSections[id] ? "▲" : "▼";
-}
-
-// ── PROGRESS ──────────────────────────────────────────────────────────────
-function setProgress(pct, label) {
-  document.getElementById("progress-bar").style.width = pct+"%";
-  document.getElementById("progress-label").textContent = label;
-}
-
-// ── API CALL ──────────────────────────────────────────────────────────────
-async function mFetch(path, extra={}) {
-  const params = new URLSearchParams({ path, token: TOKEN, ...extra });
-  const r = await fetch(`/api/meta?${params}`);
-  const d = await r.json();
-  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
-  return d;
-}
-
-// ── FETCH ALL ─────────────────────────────────────────────────────────────
-async function fetchAll() {
-  const btn = document.getElementById("btn-refresh");
-  btn.disabled = true; btn.textContent = "⏳";
-  document.getElementById("error-wrap").classList.add("hidden");
-  document.getElementById("loading").classList.remove("hidden");
-  document.getElementById("progress-wrap").classList.remove("hidden");
-  document.getElementById("content").classList.add("hidden");
-  const dp = document.getElementById("date-preset").value;
-
-  try {
-    setProgress(10, "Buscando dados da conta...");
-    const account = await mFetch(`${ACT}`, { fields:"name,account_status,currency,timezone_name,amount_spent,balance" });
-    document.getElementById("acct-name").textContent = account.name || "Arena Publicidade";
-
-    setProgress(25, "Buscando insights gerais...");
-    const acctIns = await mFetch(`${ACT}/insights`, { fields:INSIGHT_FIELDS, date_preset:dp, level:"account" });
-
-    setProgress(40, "Buscando campanhas...");
-    const campsR = await mFetch(`${ACT}/campaigns`, { fields:`id,name,status,objective,daily_budget,lifetime_budget,budget_remaining,insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit:50 });
-
-    setProgress(55, "Buscando conjuntos de anúncios...");
-    const adsetsR = await mFetch(`${ACT}/adsets`, { fields:`id,name,status,campaign_id,targeting,daily_budget,optimization_goal,insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit:100 });
-
-    setProgress(70, "Buscando anúncios e criativos...");
-    const adsR = await mFetch(`${ACT}/ads`, { fields:`id,name,status,adset_id,campaign_id,creative{id,name,title,body,image_url,thumbnail_url,call_to_action_type},insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit:100 });
-
-    setProgress(82, "Buscando públicos personalizados...");
-    let audiences = [];
-    try { const a = await mFetch(`${ACT}/customaudiences`, { fields:"id,name,subtype,approximate_count_lower_bound,approximate_count_upper_bound", limit:50 }); audiences = a.data||[]; } catch {}
-
-    setProgress(92, "Buscando pixel...");
-    let pixels = [];
-    try { const p = await mFetch(`${ACT}/adspixels`, { fields:"id,name,last_fired_time", limit:10 }); pixels = p.data||[]; } catch {}
-
-    setProgress(100, "Concluído ✓");
-    await new Promise(r=>setTimeout(r,300));
-
-    renderAll({ account, acctIns, camps:campsR.data||[], adsets:adsetsR.data||[], ads:adsR.data||[], audiences, pixels });
-
-  } catch(e) {
-    document.getElementById("loading").classList.add("hidden");
-    document.getElementById("progress-wrap").classList.add("hidden");
-    const eb = document.getElementById("error-wrap");
-    eb.classList.remove("hidden");
-    eb.innerHTML = `<div class="error-box"><strong>Erro na API Meta:</strong> ${e.message}<small>Verifique se o token tem permissões ads_read e ads_management, ou se não expirou.</small></div>`;
-  }
-  btn.disabled = false; btn.textContent = "↻ Atualizar";
-}
-
-// ── RENDER ────────────────────────────────────────────────────────────────
-function renderAll(d) {
-  document.getElementById("loading").classList.add("hidden");
-  document.getElementById("progress-wrap").classList.add("hidden");
-
-  // Dot row
-  const camps_ids = d.camps.map(c=>c.id);
-  const dotRow = document.getElementById("dot-row");
-  dotRow.innerHTML = d.camps.slice(0,8).map(c=>{
-    const col = c.status==="ACTIVE"?"#5bad85":c.status==="PAUSED"?"#d4956a":"#333";
-    return `<div class="dot" style="background:${col}" title="${c.name}"></div>`;
-  }).join("");
-
-  // Account insight values
-  const ai = d.acctIns;
-  const spend    = insVal(ai,"spend");
-  const impr     = insVal(ai,"impressions");
-  const clicks   = insVal(ai,"clicks");
-  const reach    = insVal(ai,"reach");
-  const ctr      = insVal(ai,"ctr");
-  const cpc      = insVal(ai,"cpc");
-  const cpm      = insVal(ai,"cpm");
-  const freq     = insVal(ai,"frequency");
-  const purchases= getAction(ai,"purchase");
-  const leads    = getAction(ai,"lead");
-  const addCart  = getAction(ai,"add_to_cart");
-  const viewC    = getAction(ai,"view_content");
-  const cpPurch  = getCPA(ai,"purchase");
-  const cpLead   = getCPA(ai,"lead");
-  const amtSpent = d.account.amount_spent ? Number(d.account.amount_spent)/100 : null;
-
-  // Color logic
-  const ctrCol  = ctr>1.5?"#5bad85":ctr>0.8?"#d4956a":"#e07070";
-  const freqCol = freq>3.5?"#e07070":freq>2?"#d4956a":"#5bad85";
-
-  let html = "";
-
-  // ── ACCOUNT ──
-  html += sectionHead("account","Conta");
-  html += `<div id="sec-account" class="section-body">`;
-  html += `<div class="grid">
-    ${mcard("Gasto no período", fmtR(spend), "var(--acc)")}
-    ${mcard("Impressões", fmtI(impr), "#6a9e8e")}
-    ${mcard("Cliques", fmtI(clicks), "#9b7dbf")}
-    ${mcard("Alcance", fmtI(reach), "#6a8eb5")}
-    ${mcard("CTR", fmtP(ctr), ctrCol)}
-    ${mcard("CPC", fmtR(cpc), "#b86e6e")}
-    ${mcard("CPM", fmtR(cpm), "#8e8e6a")}
-    ${mcard("Frequência", fmtN(freq,1), freqCol)}
-  </div>`;
-
-  // Conversões
-  const convCards = [
-    purchases!=null ? mcard("Compras",purchases,"#5bad85",cpPurch?`CPA: ${fmtR(cpPurch)}`:"") : "",
-    leads!=null ? mcard("Leads",leads,"#6a9e8e",cpLead?`CPL: ${fmtR(cpLead)}`:"") : "",
-    addCart!=null ? mcard("Add to Cart",addCart,"#9b7dbf") : "",
-    viewC!=null ? mcard("View Content",fmtI(viewC),"#6a8eb5") : "",
-  ].filter(Boolean);
-  if (convCards.length) {
-    html += `<div style="font-size:10px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-bottom:8px;">Eventos de Conversão</div>`;
-    html += `<div class="grid">${convCards.join("")}</div>`;
-  }
-
-  // Meta info
-  html += `<div class="grid-sm">
-    ${[["Moeda",d.account.currency],["Fuso",d.account.timezone_name],
-       ["Status conta",d.account.account_status===1?"✓ Ativa":"⚠ Restrita"],
-       ["Gasto total histórico",amtSpent?fmtR(amtSpent):"—"],
-       ["Pixels encontrados",d.pixels.length],
-       ["Públicos personalizados",d.audiences.length]
-    ].map(([k,v])=>`<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}
-  </div>`;
-  html += `</div>`; // sec-account
-
-  // ── PIXEL ──
-  if (d.pixels.length) {
-    html += `<div style="margin-bottom:20px;">`;
-    html += `<div style="font-size:10px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-bottom:10px;">Pixel</div>`;
-    d.pixels.forEach(px=>{
-      const lastFired = px.last_fired_time ? new Date(px.last_fired_time).toLocaleDateString("pt-BR") : null;
-      html += `<div class="pixel-row">
-        <div style="font-size:18px;">◈</div>
-        <div style="flex:1">
-          <div style="font-size:13px;">${px.name}</div>
-          <div style="font-size:11px;color:var(--dim);font-family:monospace;">ID: ${px.id}</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:11px;color:var(--dim);">Último disparo</div>
-          <div style="font-size:12px;color:${lastFired?"#5bad85":"#e07070"};font-family:monospace;">${lastFired||"Nunca"}</div>
-        </div>
-      </div>`;
-    });
-    html += `</div>`;
-  }
-
-  // ── CAMPANHAS ──
-  html += sectionHead("campaigns","Campanhas",d.camps.length);
-  html += `<div id="sec-campaigns" class="section-body">`;
-  if (!d.camps.length) { html += `<div style="color:var(--dim);font-size:13px;">Nenhuma campanha encontrada.</div>`; }
-  d.camps.forEach(c=>{
-    const ci = c.insights;
-    const cs = insVal(ci,"spend"), cc = insVal(ci,"ctr"), ccp = insVal(ci,"cpc");
-    const ci2 = insVal(ci,"impressions"), cf = insVal(ci,"frequency");
-    const cp = getAction(ci,"purchase"), cl = getAction(ci,"lead");
-    const cpa = getCPA(ci,"purchase")||getCPA(ci,"lead");
-    html += `<div class="camp-card">
-      <div class="camp-head">
-        <div>
-          <div class="camp-name">${c.name}</div>
-          <div class="camp-meta">${badge(c.status)}<span style="font-size:11px;color:var(--dim);font-family:monospace;">${c.objective||""}</span></div>
-        </div>
-        <div style="text-align:right">
-          <div class="camp-spend">${fmtR(cs)}</div>
-          <div style="font-size:10px;color:var(--dim);">gasto no período</div>
-        </div>
+<!-- MODAL CLIENTE -->
+<div id="modal-client" class="modal-overlay hidden">
+  <div class="modal">
+    <h3 id="modal-client-title">Novo Cliente</h3>
+    <input type="hidden" id="modal-client-id"/>
+    <div class="form-group">
+      <label class="form-label">NOME DO CLIENTE *</label>
+      <input id="mc-name" placeholder="Ex: Viva Beauty, Arena Suplementos..."/>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="margin:0">
+        <label class="form-label">NICHO</label>
+        <input id="mc-niche" placeholder="Ex: Cosméticos, Suplementos, Imóveis..."/>
       </div>
-      <div class="mini-grid">
-        ${miniCell("Impressões",fmtI(ci2))}
-        ${miniCell("CTR",fmtP(cc))}
-        ${miniCell("CPC",fmtR(ccp))}
-        ${miniCell("Freq.",fmtN(cf,1))}
-        ${cp!=null?miniCell("Compras",cp):""}
-        ${cl!=null?miniCell("Leads",cl):""}
-        ${cpa!=null?miniCell("CPA",fmtR(cpa)):""}
+      <div class="form-group" style="margin:0">
+        <label class="form-label">TIPO DE NEGÓCIO</label>
+        <select id="mc-type">
+          <option value="ecommerce">E-commerce</option>
+          <option value="b2b">B2B / Serviços</option>
+          <option value="local">Negócio Local</option>
+          <option value="infoproduto">Infoproduto</option>
+          <option value="saas">SaaS</option>
+        </select>
       </div>
-      ${c.daily_budget||c.lifetime_budget?`<div style="margin-top:8px;font-size:11px;color:var(--dim);font-family:monospace;">
-        ${c.daily_budget?`Budget diário: ${fmtR(Number(c.daily_budget)/100)}`:""}
-        ${c.lifetime_budget?`Budget total: ${fmtR(Number(c.lifetime_budget)/100)}`:""}
-        ${c.budget_remaining?` · Restante: ${fmtR(Number(c.budget_remaining)/100)}`:""}
-      </div>`:""}
-    </div>`;
-  });
-  html += `</div>`;
-
-  // ── ADSETS ──
-  html += sectionHead("adsets","Conjuntos de Anúncios",d.adsets.length);
-  html += `<div id="sec-adsets" class="section-body hidden">`;
-  d.adsets.forEach(as=>{
-    const ai2 = as.insights;
-    const as_s=insVal(ai2,"spend"), as_ctr=insVal(ai2,"ctr"), as_cpc=insVal(ai2,"cpc");
-    const as_i=insVal(ai2,"impressions"), as_f=insVal(ai2,"frequency");
-    const as_p=getAction(ai2,"purchase"), as_l=getAction(ai2,"lead");
-    const t = as.targeting||{};
-    const ages = (t.age_min||t.age_max)?`${t.age_min||"—"}–${t.age_max||"—"} anos`:"";
-    const genders = t.genders?(t.genders.includes(1)&&t.genders.includes(2)?"M+F":t.genders.includes(1)?"Masc":"Fem"):"Todos";
-    const interests = t.flexible_spec?.[0]?.interests?.slice(0,5)||[];
-    const geo = t.geo_locations?.countries?.join(", ")||t.geo_locations?.cities?.map(x=>x.name).join(", ")||"";
-    html += `<div class="camp-card">
-      <div class="camp-head">
-        <div>
-          <div class="camp-name">${as.name}</div>
-          <div class="camp-meta">${badge(as.status)}<span style="font-size:11px;color:var(--dim);font-family:monospace;">${as.optimization_goal||""}</span>${ages?`<span style="font-size:11px;color:var(--dim);">· ${ages}</span>`:""}<span style="font-size:11px;color:var(--dim);">· ${genders}</span></div>
-        </div>
-        <div class="camp-spend" style="font-size:14px;">${fmtR(as_s)}</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">TOM DE VOZ</label>
+      <textarea id="mc-tone" style="min-height:70px;" placeholder="Ex: Feminino, empoderador, científico mas acessível. Prova social e dados. Premium próximo. Sem promessas..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="margin:0">
+        <label class="form-label">BUDGET MENSAL</label>
+        <input id="mc-budget" placeholder="Ex: R$5-10k/mês"/>
       </div>
-      <div class="mini-grid">
-        ${miniCell("CTR",fmtP(as_ctr))}${miniCell("CPC",fmtR(as_cpc))}${miniCell("Impr.",fmtI(as_i))}${miniCell("Freq.",fmtN(as_f,1))}
-        ${as_p!=null?miniCell("Compras",as_p):""}${as_l!=null?miniCell("Leads",as_l):""}
+      <div class="form-group" style="margin:0">
+        <label class="form-label">OBJETIVO PRINCIPAL</label>
+        <select id="mc-objective">
+          <option value="vendas">Vendas</option>
+          <option value="leads">Leads</option>
+          <option value="trafego">Tráfego</option>
+          <option value="awareness">Reconhecimento</option>
+        </select>
       </div>
-      ${geo?`<div style="margin-top:6px;font-size:11px;color:#3a3a3a;font-family:monospace;">📍 ${geo}</div>`:""}
-      ${interests.length?`<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;">${interests.map(i=>`<span class="tag">${i.name}</span>`).join("")}</div>`:""}
-    </div>`;
-  });
-  html += `</div>`;
+    </div>
+    <div class="form-group">
+      <label class="form-label">META ADS TOKEN</label>
+      <input id="mc-token" placeholder="EAAK..." type="password"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">AD ACCOUNT ID</label>
+      <input id="mc-account" placeholder="act_..."/>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeClientModal()" class="btn-secondary">Cancelar</button>
+      <button onclick="saveClient()" class="btn-primary">Salvar</button>
+    </div>
+  </div>
+</div>
 
-  // ── ADS ──
-  html += sectionHead("ads","Anúncios",d.ads.length);
-  html += `<div id="sec-ads" class="section-body hidden">`;
-  d.ads.forEach(ad=>{
-    const adi=ad.insights;
-    const ad_s=insVal(adi,"spend"),ad_ctr=insVal(adi,"ctr"),ad_cpc=insVal(adi,"cpc");
-    const ad_i=insVal(adi,"impressions"),ad_f=insVal(adi,"frequency");
-    const ad_p=getAction(adi,"purchase"),ad_l=getAction(adi,"lead");
-    const cr=ad.creative||{};
-    html += `<div class="ad-card">
-      <div class="ad-row">
-        ${cr.thumbnail_url?`<img class="ad-thumb" src="${cr.thumbnail_url}" onerror="this.style.display='none'" alt=""/>`:""}
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
-            <div style="font-size:12.5px;line-height:1.3;">${ad.name}</div>
-            ${badge(ad.status)}
-          </div>
-          ${cr.title?`<div style="font-size:11.5px;color:var(--acc);margin-bottom:2px;">${cr.title}</div>`:""}
-          ${cr.body?`<div style="font-size:11px;color:var(--dim);line-height:1.45;">${(cr.body||"").slice(0,120)}${(cr.body||"").length>120?"...":""}</div>`:""}
-          ${cr.call_to_action_type?`<span class="cta-tag">${cr.call_to_action_type}</span>`:""}
-        </div>
-      </div>
-      <div class="mini-grid" style="margin-top:8px;">
-        ${miniCell("Gasto",fmtR(ad_s))}${miniCell("CTR",fmtP(ad_ctr))}${miniCell("CPC",fmtR(ad_cpc))}${miniCell("Impr.",fmtI(ad_i))}${miniCell("Freq.",fmtN(ad_f,1))}
-        ${ad_p!=null?miniCell("Compras",ad_p):""}${ad_l!=null?miniCell("Leads",ad_l):""}
-      </div>
-    </div>`;
-  });
-  html += `</div>`;
+<!-- MODAL RESULTADO HISTÓRICO -->
+<div id="modal-hist" class="modal-overlay hidden">
+  <div class="modal" style="max-width:720px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <h3 id="modal-hist-title" style="margin:0;font-size:14px;">Resultado</h3>
+      <button onclick="closeHistModal()" style="padding:6px 12px;background:none;border:1px solid var(--brd);color:var(--dim);font-size:12px;">✕ Fechar</button>
+    </div>
+    <div id="modal-hist-body" style="font-size:13px;line-height:1.7;color:#b8b4ae;white-space:pre-wrap;max-height:65vh;overflow-y:auto;"></div>
+  </div>
+</div>
 
-  // ── PÚBLICOS ──
-  if (d.audiences.length) {
-    html += sectionHead("audiences","Públicos Personalizados",d.audiences.length);
-    html += `<div id="sec-audiences" class="section-body hidden">`;
-    d.audiences.forEach(au=>{
-      html += `<div class="aud-row">
-        <div><div style="font-size:13px;">${au.name}</div><div style="font-size:11px;color:var(--dim);font-family:monospace;">${au.subtype}</div></div>
-        <div style="text-align:right;">
-          <div style="font-size:12px;color:#6a8eb5;font-family:monospace;">${au.approximate_count_lower_bound?Number(au.approximate_count_lower_bound).toLocaleString("pt-BR")+"+":" —"}</div>
-          <div style="font-size:10px;color:var(--dim);">pessoas</div>
-        </div>
-      </div>`;
-    });
-    html += `</div>`;
-  }
-
-  document.getElementById("content").innerHTML = html;
-  document.getElementById("content").classList.remove("hidden");
-
-  // Restore section states
-  Object.entries(openSections).forEach(([id,open])=>{
-    const el = document.getElementById(`sec-${id}`);
-    const arr = document.getElementById(`arr-${id}`);
-    if (el) el.classList.toggle("hidden", !open);
-    if (arr) arr.textContent = open?"▲":"▼";
-  });
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
-document.getElementById("date-preset").addEventListener("change", fetchAll);
-fetchAll();
-</script>
+<script src="app.js"></script>
 </body>
 </html>

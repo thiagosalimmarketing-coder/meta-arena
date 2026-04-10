@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/meta", "destination": "/api/meta.js" }
+    { "source": "/api/meta", "destination": "/api/meta.js" },
+    { "source": "/api/ai", "destination": "/api/ai.js" }
   ]
 }
