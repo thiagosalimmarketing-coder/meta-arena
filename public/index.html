@@ -3,215 +3,191 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Arena — Hub de Marketing IA</title>
+<title>Arena — Assistente de Tráfego Pago</title>
 <style>
 :root {
-  --bg: #090909; --surf: #0f0f0f; --brd: #1c1c1c;
-  --txt: #ebe7e1; --dim: #555; --acc: #d4956a;
-  --green: #5bad85; --red: #e07070; --blue: #6a8eb5; --purple: #9b7dbf;
+  --bg:#090909;--surf:#0f0f0f;--brd:#1c1c1c;
+  --txt:#ebe7e1;--dim:#555;--acc:#d4956a;
+  --green:#5bad85;--red:#e07070;--blue:#6a8eb5;--purple:#9b7dbf;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--txt); font-family: Georgia, serif; font-size: 14px; min-height: 100vh; }
-input, select, textarea {
-  background: var(--surf); border: 1px solid var(--brd); color: var(--txt);
-  padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none;
-  font-family: Georgia, serif; width: 100%;
-}
-input:focus, select:focus, textarea:focus { border-color: var(--acc); }
-textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
-button { cursor: pointer; font-family: Georgia, serif; font-weight: 600; border: none; border-radius: 6px; transition: opacity .15s; }
-button:hover:not(:disabled) { opacity: .8; }
-button:disabled { cursor: not-allowed; opacity: .4; }
-select option { background: #111; }
-::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt);font-family:Georgia,serif;font-size:14px;min-height:100vh;}
+input,select,textarea{background:var(--surf);border:1px solid var(--brd);color:var(--txt);padding:8px 12px;border-radius:6px;font-size:13px;outline:none;font-family:Georgia,serif;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);}
+textarea{resize:vertical;min-height:90px;line-height:1.5;}
+button{cursor:pointer;font-family:Georgia,serif;font-weight:600;border:none;border-radius:6px;transition:opacity .15s;}
+button:hover:not(:disabled){opacity:.8;}
+button:disabled{cursor:not-allowed;opacity:.4;}
+select option{background:#111;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px;}
 
 /* HEADER */
-#header {
-  border-bottom: 1px solid var(--brd); padding: 12px 24px;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  position: sticky; top: 0; z-index: 100; background: var(--bg);
-}
-#header-left .sub { font-size: 10px; letter-spacing: .35em; color: #2e2e2e; margin-bottom: 1px; text-transform: uppercase; }
-#header-left .title { font-size: 17px; font-weight: 400; }
-#header-center select { width: 200px; font-size: 13px; }
-#header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#header{border-bottom:1px solid var(--brd);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100;background:var(--bg);}
+#header-left .sub{font-size:9px;letter-spacing:.35em;color:#2a2a2a;margin-bottom:1px;text-transform:uppercase;}
+#header-left .title{font-size:16px;font-weight:400;}
+#header-center select{width:190px;font-size:12px;}
+#header-right{display:flex;gap:8px;align-items:center;}
 
-/* TAB NAV */
-#tab-nav {
-  display: flex; gap: 2px; padding: 0 24px;
-  border-bottom: 1px solid var(--brd); background: var(--bg);
-  position: sticky; top: 57px; z-index: 99; overflow-x: auto;
-}
-.tab-btn {
-  padding: 10px 16px; background: none; color: var(--dim);
-  font-size: 12px; letter-spacing: .1em; border-radius: 0;
-  border-bottom: 2px solid transparent; white-space: nowrap;
-  transition: color .15s, border-color .15s;
-}
-.tab-btn:hover { color: var(--txt); opacity: 1; }
-.tab-btn.active { color: var(--acc); border-bottom-color: var(--acc); }
+/* TABS */
+#tab-nav{display:flex;gap:0;padding:0 20px;border-bottom:1px solid var(--brd);background:var(--bg);position:sticky;top:52px;z-index:99;overflow-x:auto;}
+.tab-btn{padding:9px 14px;background:none;color:var(--dim);font-size:11px;letter-spacing:.08em;border-radius:0;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;}
+.tab-btn:hover{color:var(--txt);opacity:1;}
+.tab-btn.active{color:var(--acc);border-bottom-color:var(--acc);}
 
 /* PANELS */
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-#main { max-width: 960px; margin: 0 auto; padding: 28px 20px; }
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.main{max-width:960px;margin:0 auto;padding:24px 20px;}
 
 /* FORM */
-.form-label { font-size: 10px; letter-spacing: .2em; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; display: block; }
-.form-group { margin-bottom: 16px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.form-label{font-size:10px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-bottom:6px;display:block;}
+.form-group{margin-bottom:14px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
 
-/* CARD */
-.card { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 16px 18px; margin-bottom: 10px; }
-.card-title { font-size: 13px; margin-bottom: 12px; color: var(--txt); }
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:16px 18px;margin-bottom:10px;}
 
 /* PIPELINE */
-.pipeline-nodes {
-  display: flex; align-items: center; gap: 0; margin: 16px 0 24px;
-  flex-wrap: wrap; row-gap: 8px;
-}
-.p-node {
-  display: flex; align-items: center; gap: 6px;
-  padding: 7px 14px; border-radius: 20px; font-size: 12px;
-  border: 1px solid var(--brd); background: var(--surf); color: var(--dim);
-  transition: all .3s; white-space: nowrap;
-}
-.p-node.running { border-color: var(--acc); color: var(--acc); background: #1a110a; }
-.p-node.done { border-color: #5bad8560; color: var(--green); background: #0a130f; }
-.p-node.error { border-color: #e0707060; color: var(--red); background: #130a0a; }
-.p-arrow { color: #2a2a2a; margin: 0 4px; font-size: 12px; }
-.p-node-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-.agent-result {
-  border: 1px solid var(--brd); border-radius: 8px;
-  margin-bottom: 10px; overflow: hidden;
-}
-.agent-result-head {
-  padding: 10px 14px; background: #0d0d0d;
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: pointer; user-select: none;
-}
-.agent-result-head .agent-name { font-size: 11px; letter-spacing: .15em; color: #888; text-transform: uppercase; }
-.agent-result-body { padding: 16px 18px; font-size: 13px; line-height: 1.7; color: #b8b4ae; white-space: pre-wrap; }
-.agent-result-body strong { color: var(--txt); }
-
-/* COPY CARDS */
-.copy-card {
-  background: var(--surf); border: 1px solid var(--brd); border-radius: 8px;
-  padding: 16px 18px; margin-bottom: 10px;
-}
-.copy-card .copy-var { font-size: 10px; letter-spacing: .2em; color: var(--acc); text-transform: uppercase; margin-bottom: 10px; }
-.copy-field { margin-bottom: 8px; }
-.copy-field .ck { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .15em; margin-bottom: 2px; }
-.copy-field .cv { font-size: 13px; line-height: 1.5; color: var(--txt); }
-.copy-actions { display: flex; gap: 8px; margin-top: 12px; }
-.btn-copy { padding: 5px 12px; background: #161616; border: 1px solid #222; color: var(--dim); font-size: 11px; }
-.btn-copy:hover { color: var(--txt); }
+.pipeline-nodes{display:flex;align-items:center;gap:0;margin:14px 0 20px;flex-wrap:wrap;row-gap:8px;}
+.p-node{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;font-size:11px;border:1px solid var(--brd);background:var(--surf);color:var(--dim);transition:all .3s;white-space:nowrap;}
+.p-node.running{border-color:var(--acc);color:var(--acc);background:#1a110a;}
+.p-node.done{border-color:#5bad8560;color:var(--green);background:#0a130f;}
+.p-node.error{border-color:#e0707060;color:var(--red);background:#130a0a;}
+.p-arrow{color:#2a2a2a;margin:0 3px;font-size:11px;}
+.agent-result{border:1px solid var(--brd);border-radius:8px;margin-bottom:10px;overflow:hidden;}
+.agent-result-head{padding:10px 14px;background:#0d0d0d;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.agent-result-head .agent-name{font-size:11px;letter-spacing:.15em;color:#888;text-transform:uppercase;}
+.agent-result-body{padding:16px 18px;font-size:13px;line-height:1.7;color:#b8b4ae;}
+.agent-result-body strong,.agent-result-body b{color:var(--txt);}
 
 /* METRICS */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
-.grid-sm { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-bottom: 14px; }
-.mcard { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; }
-.mcard .lbl { font-size: 10px; letter-spacing: .18em; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
-.mcard .val { font-size: 20px; font-weight: 600; font-family: monospace; }
-.mcard .sub { font-size: 11px; color: #444; margin-top: 3px; }
-.kv { padding: 8px 12px; background: var(--surf); border: 1px solid var(--brd); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
-.kv .k { font-size: 11.5px; color: var(--dim); }
-.kv .v { font-size: 11.5px; font-family: monospace; }
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:14px;}
+.mcard{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:14px 16px;}
+.mcard .lbl{font-size:10px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-bottom:6px;}
+.mcard .val{font-size:20px;font-weight:600;font-family:monospace;}
+.mcard .sub{font-size:11px;color:#444;margin-top:3px;}
+.kv{padding:8px 12px;background:var(--surf);border:1px solid var(--brd);border-radius:6px;display:flex;justify-content:space-between;align-items:center;}
+.kv .k{font-size:11.5px;color:var(--dim);}
+.kv .v{font-size:11.5px;font-family:monospace;}
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--brd);cursor:pointer;user-select:none;margin-bottom:14px;}
+.section-head span{font-size:11px;letter-spacing:.2em;color:#888;text-transform:uppercase;}
+.section-body{margin-bottom:22px;}
+.badge{padding:2px 8px;border-radius:20px;font-size:11px;font-family:monospace;white-space:nowrap;}
+.badge-ACTIVE{background:#5bad8520;border:1px solid #5bad8540;color:#5bad85;}
+.badge-PAUSED{background:#d4956a20;border:1px solid #d4956a40;color:#d4956a;}
+.badge-ARCHIVED{background:#55555520;border:1px solid #55555540;color:#555;}
+.camp-card{margin-bottom:10px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:14px 16px;}
+.camp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.camp-name{font-size:13.5px;color:var(--txt);margin-bottom:4px;line-height:1.3;}
+.camp-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.camp-spend{font-size:16px;color:var(--acc);font-family:monospace;font-weight:600;flex-shrink:0;}
+.mini-grid{display:flex;gap:6px;flex-wrap:wrap;}
+.mini-cell{padding:4px 8px;background:#0d0d0d;border:1px solid #181818;border-radius:4px;}
+.mini-cell .mk{font-size:9.5px;color:#3a3a3a;}
+.mini-cell .mv{font-size:12px;font-family:monospace;}
+.camp-ai-btn{padding:5px 12px;background:#12100e;border:1px solid #2a1f14;color:var(--acc);font-size:11px;font-family:monospace;border-radius:4px;flex-shrink:0;}
+.camp-ai-result{margin-top:12px;padding:14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:6px;font-size:12.5px;line-height:1.7;color:#a8a4a0;display:none;}
+.camp-ai-result strong,.camp-ai-result b{color:var(--txt);}
+.ad-card{margin-bottom:8px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;}
+.ad-thumb{width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--brd);flex-shrink:0;}
+.ad-row{display:flex;gap:12px;}
+.cta-tag{margin-top:4px;display:inline-block;font-size:10px;padding:2px 7px;background:#6a9e8e20;border:1px solid #6a9e8e40;border-radius:3px;color:#6a9e8e;font-family:monospace;}
+.aud-row{margin-bottom:6px;padding:10px 14px;background:var(--surf);border:1px solid var(--brd);border-radius:7px;display:flex;justify-content:space-between;align-items:center;}
+.pixel-row{padding:12px 14px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;display:flex;gap:16px;align-items:center;margin-bottom:8px;}
 
-/* SECTION */
-.section-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--brd); cursor: pointer; user-select: none; margin-bottom: 14px; }
-.section-head span { font-size: 11px; letter-spacing: .2em; color: #888; text-transform: uppercase; }
-.section-head .arrow { color: #333; font-size: 12px; }
-.section-body { margin-bottom: 24px; }
+/* DIAGNÓSTICO */
+.diag-bar{padding:12px 16px;border-radius:8px;display:flex;align-items:center;gap:12px;margin-bottom:16px;border:1px solid var(--brd);}
+.diag-score{font-size:28px;font-weight:600;font-family:monospace;flex-shrink:0;min-width:50px;text-align:center;}
+.diag-body{flex:1;}
+.diag-status{font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px;}
+.diag-text{font-size:12.5px;line-height:1.5;color:#888;}
+.diag-saudavel{background:#0a130f;border-color:#5bad8540;}
+.diag-atencao{background:#120f08;border-color:#d4956a40;}
+.diag-critico{background:#130707;border-color:#e0707040;}
 
-/* BADGE */
-.badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-family: monospace; white-space: nowrap; }
-.badge-ACTIVE   { background:#5bad8520; border:1px solid #5bad8540; color:#5bad85; }
-.badge-PAUSED   { background:#d4956a20; border:1px solid #d4956a40; color:#d4956a; }
-.badge-ARCHIVED { background:#55555520; border:1px solid #55555540; color:#555; }
+/* CHAT */
+#chat-messages{height:420px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#0a0a0a;border:1px solid var(--brd);border-radius:8px 8px 0 0;}
+.msg{max-width:82%;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.6;}
+.msg-user{background:#1a110a;border:1px solid #2a1f14;color:var(--txt);align-self:flex-end;border-radius:8px 8px 2px 8px;}
+.msg-ai{background:var(--surf);border:1px solid var(--brd);color:#c8c4be;align-self:flex-start;border-radius:2px 8px 8px 8px;}
+.msg-ai strong,.msg-ai b{color:var(--txt);}
+.chat-input-area{display:flex;gap:0;border:1px solid var(--brd);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;}
+#chat-input{border:none;border-radius:0;font-size:13px;padding:12px 14px;resize:none;min-height:52px;max-height:120px;}
+#chat-input:focus{border:none;}
+#btn-chat-send{padding:0 18px;background:var(--acc);color:#080808;border-radius:0;font-size:13px;flex-shrink:0;}
+.chat-suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.chat-suggestion{padding:5px 11px;background:var(--surf);border:1px solid var(--brd);color:var(--dim);font-size:11px;border-radius:20px;}
+.chat-suggestion:hover{color:var(--txt);}
 
-/* CAMPAIGN CARD */
-.camp-card { margin-bottom: 10px; background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; }
-.camp-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.camp-name { font-size: 13.5px; color: var(--txt); margin-bottom: 4px; line-height: 1.3; }
-.camp-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.camp-spend { font-size: 16px; color: var(--acc); font-family: monospace; font-weight: 600; flex-shrink: 0; }
-.mini-grid { display: flex; gap: 6px; flex-wrap: wrap; }
-.mini-cell { padding: 4px 8px; background: #0d0d0d; border: 1px solid #181818; border-radius: 4px; }
-.mini-cell .mk { font-size: 9.5px; color: #3a3a3a; }
-.mini-cell .mv { font-size: 12px; font-family: monospace; }
-.camp-ai-btn { padding: 5px 12px; background: #12100e; border: 1px solid #2a1f14; color: var(--acc); font-size: 11px; font-family: monospace; border-radius: 4px; flex-shrink: 0; }
-.camp-ai-result { margin-top: 12px; padding: 14px; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 6px; font-size: 12.5px; line-height: 1.7; color: #a8a4a0; white-space: pre-wrap; display: none; }
-.camp-ai-result strong { color: var(--txt); }
+/* CALCULADORA */
+.calc-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:18px;margin-bottom:12px;}
+.calc-title{font-size:11px;letter-spacing:.2em;color:var(--acc);text-transform:uppercase;margin-bottom:14px;}
+.calc-result{margin-top:14px;padding:12px 14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:6px;}
+.calc-result-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+.calc-result-row .cr-k{font-size:12px;color:var(--dim);}
+.calc-result-row .cr-v{font-size:14px;font-family:monospace;font-weight:600;}
 
-/* AD CARD */
-.ad-card { margin-bottom: 8px; background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 12px 14px; }
-.ad-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--brd); flex-shrink: 0; }
-.ad-row { display: flex; gap: 12px; }
-.cta-tag { margin-top: 4px; display: inline-block; font-size: 10px; padding: 2px 7px; background: #6a9e8e20; border: 1px solid #6a9e8e40; border-radius: 3px; color: #6a9e8e; font-family: monospace; }
-.aud-row { margin-bottom: 6px; padding: 10px 14px; background: var(--surf); border: 1px solid var(--brd); border-radius: 7px; display: flex; justify-content: space-between; align-items: center; }
-.pixel-row { padding: 12px 14px; background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
+/* RELATÓRIO */
+#relatorio-output{background:#0a0a0a;border:1px solid var(--brd);border-radius:8px;padding:20px;font-size:13px;line-height:1.8;color:#b8b4ae;white-space:pre-wrap;min-height:200px;}
+#relatorio-output strong,#relatorio-output b{color:var(--txt);}
 
-/* ERROR / LOADING */
-.error-box { padding: 14px 16px; background: #130707; border: 1px solid #3a1010; border-radius: 8px; color: var(--red); font-size: 13px; margin-bottom: 20px; }
-.error-box small { display: block; margin-top: 6px; font-size: 11px; color: #854040; }
-#loading { text-align: center; padding: 60px 20px; color: var(--dim); }
-#loading .icon { font-size: 28px; margin-bottom: 12px; animation: pulse 1.5s infinite; }
-#progress-wrap { background: #0f0f0f; border: 1px solid #1c1c1c; border-radius: 7px; padding: 14px 16px; margin-bottom: 20px; }
-#progress-bar-track { height: 2px; background: #1c1c1c; border-radius: 1px; margin-top: 8px; }
-#progress-bar { height: 100%; border-radius: 1px; background: linear-gradient(90deg, var(--acc), var(--purple)); width: 0%; transition: width .5s ease; }
-#progress-label { font-size: 11px; font-family: monospace; color: var(--dim); }
-
-/* HISTORY */
-.hist-item { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
-.hist-item:hover { border-color: #2a2a2a; }
-.hist-type { font-size: 10px; padding: 2px 8px; border-radius: 3px; font-family: monospace; background: #161616; border: 1px solid #222; color: var(--dim); }
-.hist-title { font-size: 13px; flex: 1; }
-.hist-date { font-size: 11px; color: var(--dim); font-family: monospace; }
-.hist-del { padding: 4px 8px; background: none; border: 1px solid #2a1010; color: #6b3030; font-size: 11px; }
-
-/* PROFILES */
-.profile-card { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 16px 18px; margin-bottom: 10px; }
-.profile-name { font-size: 15px; margin-bottom: 4px; }
-.profile-meta { font-size: 12px; color: var(--dim); margin-bottom: 12px; }
-.profile-actions { display: flex; gap: 8px; }
-.btn-edit { padding: 6px 14px; background: #161616; border: 1px solid #222; color: var(--dim); font-size: 12px; }
-.btn-del { padding: 6px 14px; background: #130707; border: 1px solid #2a1010; color: #6b3030; font-size: 12px; }
-
-/* MODAL */
-.modal-overlay { position: fixed; inset: 0; background: #000000cc; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal { background: var(--bg); border: 1px solid var(--brd); border-radius: 10px; padding: 24px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
-.modal h3 { font-size: 15px; font-weight: 400; margin-bottom: 20px; }
-.modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
-
-/* AI LOADING */
-.ai-loading { display: flex; align-items: center; gap: 10px; padding: 16px; color: var(--dim); font-size: 13px; }
-.ai-spinner { width: 16px; height: 16px; border: 2px solid #222; border-top-color: var(--acc); border-radius: 50%; animation: spin .7s linear infinite; }
-
-/* TONE BOX */
-.tone-box { padding: 10px 14px; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 6px; font-size: 12px; color: #666; margin-bottom: 20px; line-height: 1.5; }
-.tone-box strong { color: var(--acc); }
-
-/* SECTION DIVIDER */
-.section-divider { font-size: 10px; letter-spacing: .3em; color: #2a2a2a; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #141414; }
+/* SWIPE FILE */
+.swipe-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.swipe-tag{font-size:10px;padding:2px 8px;border-radius:3px;background:#161616;border:1px solid #222;color:var(--dim);font-family:monospace;margin-right:4px;}
+.swipe-headline{font-size:14px;color:var(--acc);margin:8px 0 4px;}
+.swipe-body{font-size:12.5px;color:#888;line-height:1.5;margin-bottom:6px;}
+.swipe-cta{font-size:11px;color:#6a9e8e;font-family:monospace;}
+.swipe-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.swipe-filter-btn{padding:5px 12px;background:var(--surf);border:1px solid var(--brd);color:var(--dim);font-size:11px;border-radius:20px;}
+.swipe-filter-btn.active{border-color:var(--acc);color:var(--acc);}
 
 /* MISC */
-.tag { font-size: 10px; padding: 1px 6px; background: #161616; border: 1px solid #1e1e1e; border-radius: 3px; color: #555; }
-.dots { display: flex; gap: 4px; }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brd); transition: all .3s; }
-.hidden { display: none !important; }
-.btn-primary { padding: 10px 22px; background: var(--acc); color: #080808; font-size: 13px; }
-.btn-secondary { padding: 10px 22px; background: #161616; border: 1px solid var(--brd); color: var(--txt); font-size: 13px; }
-.empty-state { text-align: center; padding: 48px 20px; color: var(--dim); }
-.empty-state .ei { font-size: 32px; margin-bottom: 12px; }
-.empty-state p { font-size: 13px; }
+.error-box{padding:14px 16px;background:#130707;border:1px solid #3a1010;border-radius:8px;color:var(--red);font-size:13px;margin-bottom:20px;}
+.error-box small{display:block;margin-top:6px;font-size:11px;color:#854040;}
+#loading{text-align:center;padding:60px 20px;color:var(--dim);}
+#loading .icon{font-size:28px;margin-bottom:12px;animation:pulse 1.5s infinite;}
+#progress-wrap{background:#0f0f0f;border:1px solid #1c1c1c;border-radius:7px;padding:14px 16px;margin-bottom:20px;}
+#progress-bar-track{height:2px;background:#1c1c1c;border-radius:1px;margin-top:8px;}
+#progress-bar{height:100%;border-radius:1px;background:linear-gradient(90deg,var(--acc),var(--purple));width:0%;transition:width .5s ease;}
+#progress-label{font-size:11px;font-family:monospace;color:var(--dim);}
+.hist-item{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;}
+.hist-item:hover{border-color:#2a2a2a;}
+.hist-type{font-size:10px;padding:2px 8px;border-radius:3px;font-family:monospace;background:#161616;border:1px solid #222;color:var(--dim);white-space:nowrap;}
+.hist-title{font-size:13px;flex:1;}
+.hist-date{font-size:11px;color:var(--dim);font-family:monospace;white-space:nowrap;}
+.hist-del{padding:3px 8px;background:none;border:1px solid #2a1010;color:#6b3030;font-size:11px;flex-shrink:0;}
+.profile-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.profile-name{font-size:15px;margin-bottom:3px;}
+.profile-meta{font-size:12px;color:var(--dim);margin-bottom:10px;}
+.modal-overlay{position:fixed;inset:0;background:#000000cc;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:var(--bg);border:1px solid var(--brd);border-radius:10px;padding:22px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:15px;font-weight:400;margin-bottom:18px;}
+.modal-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end;}
+.ai-loading{display:flex;align-items:center;gap:10px;padding:14px;color:var(--dim);font-size:13px;}
+.ai-spinner{width:16px;height:16px;border:2px solid #222;border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+.tone-box{padding:10px 14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:6px;font-size:12px;color:#555;margin-bottom:16px;line-height:1.5;}
+.tone-box strong{color:var(--acc);}
+.sec-divider{font-size:10px;letter-spacing:.3em;color:#2a2a2a;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #141414;}
+.tag{font-size:10px;padding:1px 6px;background:#161616;border:1px solid #1e1e1e;border-radius:3px;color:#555;}
+.dots{display:flex;gap:4px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--brd);transition:all .3s;}
+.hidden{display:none!important;}
+.btn-primary{padding:9px 20px;background:var(--acc);color:#080808;font-size:13px;}
+.btn-secondary{padding:9px 20px;background:#161616;border:1px solid var(--brd);color:var(--txt);font-size:13px;}
+.btn-sm{padding:5px 12px;font-size:11px;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--dim);}
+.empty-state .ei{font-size:32px;margin-bottom:12px;}
+.empty-state p{font-size:13px;}
+.btn-copy{padding:5px 12px;background:#161616;border:1px solid #222;color:var(--dim);font-size:11px;}
+.btn-copy:hover{color:var(--txt);}
 
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-@keyframes spin { to{transform:rotate(360deg)} }
-@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-.fade { animation: fadeIn .35s ease; }
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeIn .35s ease;}
 </style>
 </head>
 <body>
@@ -219,8 +195,8 @@ select option { background: #111; }
 <!-- HEADER -->
 <div id="header">
   <div id="header-left">
-    <div class="sub">ARENA PUBLICIDADE · IA</div>
-    <div class="title">Hub de Marketing</div>
+    <div class="sub">ARENA PUBLICIDADE · TRÁFEGO PAGO</div>
+    <div class="title">Assistente de Tráfego IA</div>
   </div>
   <div id="header-center">
     <select id="client-select" onchange="onClientChange(this.value)">
@@ -229,7 +205,7 @@ select option { background: #111; }
   </div>
   <div id="header-right">
     <div class="dots" id="dot-row"></div>
-    <select id="date-preset" style="width:150px;">
+    <select id="date-preset" style="width:140px;font-size:12px;">
       <option value="today">Hoje</option>
       <option value="yesterday">Ontem</option>
       <option value="last_7d">Últimos 7 dias</option>
@@ -243,18 +219,48 @@ select option { background: #111; }
 
 <!-- TAB NAV -->
 <nav id="tab-nav">
-  <button class="tab-btn active" data-tab="pipeline" onclick="switchTab('pipeline')">🚀 Pipeline</button>
-  <button class="tab-btn" data-tab="rapido" onclick="switchTab('rapido')">⚡ Rápido</button>
-  <button class="tab-btn" data-tab="metricas" onclick="switchTab('metricas')">📊 Métricas</button>
-  <button class="tab-btn" data-tab="criativo" onclick="switchTab('criativo')">🎨 Criativo</button>
-  <button class="tab-btn" data-tab="historico" onclick="switchTab('historico')">📋 Histórico</button>
-  <button class="tab-btn" data-tab="perfis" onclick="switchTab('perfis')">⚙ Perfis</button>
+  <button class="tab-btn active" data-tab="chat"       onclick="switchTab('chat')">💬 Chat</button>
+  <button class="tab-btn" data-tab="pipeline"  onclick="switchTab('pipeline')">🚀 Pipeline</button>
+  <button class="tab-btn" data-tab="rapido"    onclick="switchTab('rapido')">⚡ Rápido</button>
+  <button class="tab-btn" data-tab="metricas"  onclick="switchTab('metricas')">📊 Métricas</button>
+  <button class="tab-btn" data-tab="criativo"  onclick="switchTab('criativo')">🎨 Criativo</button>
+  <button class="tab-btn" data-tab="relatorio" onclick="switchTab('relatorio')">📄 Relatório</button>
+  <button class="tab-btn" data-tab="calc"      onclick="switchTab('calc')">🧮 Calculadora</button>
+  <button class="tab-btn" data-tab="swipe"     onclick="switchTab('swipe')">📚 Swipe File</button>
+  <button class="tab-btn" data-tab="historico" onclick="switchTab('historico')">🕓 Histórico</button>
+  <button class="tab-btn" data-tab="perfis"    onclick="switchTab('perfis')">⚙ Perfis</button>
 </nav>
 
-<!-- ──────────── PIPELINE ──────────── -->
-<div id="tab-pipeline" class="tab-panel active">
-<div id="main">
-  <div class="section-divider">PIPELINE COMPLETO — 5 AGENTES EM SEQUÊNCIA</div>
+<!-- ══════════ CHAT ══════════ -->
+<div id="tab-chat" class="tab-panel active">
+<div class="main">
+  <div class="sec-divider">ASSISTENTE PESSOAL DE TRÁFEGO PAGO</div>
+  <div id="chat-client-info" class="tone-box hidden"></div>
+  <div class="chat-suggestions" id="chat-suggestions">
+    <button class="chat-suggestion" onclick="sendSuggestion(this.textContent)">Como estão minhas campanhas?</button>
+    <button class="chat-suggestion" onclick="sendSuggestion(this.textContent)">Quais problemas você identifica?</button>
+    <button class="chat-suggestion" onclick="sendSuggestion(this.textContent)">O que otimizar primeiro?</button>
+    <button class="chat-suggestion" onclick="sendSuggestion(this.textContent)">Minha frequência está alta?</button>
+    <button class="chat-suggestion" onclick="sendSuggestion(this.textContent)">Como escalar essa campanha?</button>
+    <button class="chat-suggestion" onclick="sendSuggestion(this.textContent)">Qual público testar agora?</button>
+  </div>
+  <div id="chat-messages">
+    <div class="msg msg-ai">Olá! Sou seu assistente de tráfego pago. Selecione um cliente e carregue as métricas para eu ter contexto completo das suas campanhas. Depois me pergunte qualquer coisa! 🚀</div>
+  </div>
+  <div class="chat-input-area">
+    <textarea id="chat-input" placeholder="Pergunte sobre suas campanhas, peça análises, copies, estratégias..." onkeydown="chatKeydown(event)"></textarea>
+    <button id="btn-chat-send" onclick="sendChat()">Enviar</button>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+    <button onclick="clearChat()" style="padding:4px 10px;background:none;border:1px solid #1a1a1a;color:#333;font-size:11px;">Limpar conversa</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PIPELINE ══════════ -->
+<div id="tab-pipeline" class="tab-panel">
+<div class="main">
+  <div class="sec-divider">PIPELINE COMPLETO — 5 AGENTES EM SEQUÊNCIA</div>
   <div class="pipeline-nodes" id="pipeline-nodes"></div>
   <div id="pipeline-tone" class="tone-box hidden"></div>
   <div class="form-group">
@@ -278,23 +284,19 @@ select option { background: #111; }
       </select>
     </div>
   </div>
-  <button id="btn-pipeline" class="btn-primary" onclick="runPipeline()" style="width:100%;margin-bottom:28px;">🚀 Ativar Pipeline Completo</button>
+  <button id="btn-pipeline" class="btn-primary" onclick="runPipeline()" style="width:100%;margin-bottom:24px;">🚀 Ativar Pipeline Completo</button>
   <div id="pipeline-results"></div>
 </div>
 </div>
 
-<!-- ──────────── RÁPIDO ──────────── -->
+<!-- ══════════ RÁPIDO ══════════ -->
 <div id="tab-rapido" class="tab-panel">
-<div id="main">
-  <div class="section-divider">GERADOR RÁPIDO DE COPIES</div>
+<div class="main">
+  <div class="sec-divider">GERADOR RÁPIDO DE COPIES</div>
   <div id="rapido-tone" class="tone-box hidden"></div>
-  <div class="form-group">
-    <label class="form-label">PRODUTO / SERVIÇO</label>
-    <input id="rapido-produto" placeholder="Ex: Curso de confeitaria online, R$297"/>
-  </div>
+  <div class="form-group"><label class="form-label">PRODUTO / SERVIÇO</label><input id="rapido-produto" placeholder="Ex: Curso de confeitaria online, R$297"/></div>
   <div class="form-row">
-    <div class="form-group" style="margin:0">
-      <label class="form-label">ÂNGULO PRINCIPAL</label>
+    <div class="form-group" style="margin:0"><label class="form-label">ÂNGULO</label>
       <select id="rapido-angulo">
         <option value="dor">Dor / Problema</option>
         <option value="desejo">Desejo / Transformação</option>
@@ -303,8 +305,7 @@ select option { background: #111; }
         <option value="curiosidade">Curiosidade / Intriga</option>
       </select>
     </div>
-    <div class="form-group" style="margin:0">
-      <label class="form-label">FORMATO</label>
+    <div class="form-group" style="margin:0"><label class="form-label">FORMATO</label>
       <select id="rapido-formato">
         <option value="feed">Feed (imagem/vídeo)</option>
         <option value="stories">Stories</option>
@@ -314,92 +315,166 @@ select option { background: #111; }
       </select>
     </div>
   </div>
-  <div class="form-group">
-    <label class="form-label">DETALHES ADICIONAIS (opcional)</label>
-    <textarea id="rapido-detalhes" style="min-height:70px;" placeholder="Público-alvo, oferta, benefício principal, CTA desejado..."></textarea>
-  </div>
-  <button id="btn-rapido" class="btn-primary" onclick="runRapido()" style="width:100%;margin-bottom:28px;">⚡ Gerar Copies Agora</button>
+  <div class="form-group"><label class="form-label">DETALHES (opcional)</label><textarea id="rapido-detalhes" style="min-height:70px;" placeholder="Público-alvo, benefício principal, CTA desejado..."></textarea></div>
+  <button id="btn-rapido" class="btn-primary" onclick="runRapido()" style="width:100%;margin-bottom:24px;">⚡ Gerar Copies Agora</button>
   <div id="rapido-results"></div>
 </div>
 </div>
 
-<!-- ──────────── MÉTRICAS ──────────── -->
+<!-- ══════════ MÉTRICAS ══════════ -->
 <div id="tab-metricas" class="tab-panel">
-<div id="main">
-  <div id="metricas-no-client" class="empty-state hidden">
-    <div class="ei">📊</div>
-    <p>Selecione um cliente no topo ou configure o token abaixo para ver as métricas.</p>
-  </div>
+<div class="main">
+  <div id="diag-wrap" class="hidden"></div>
   <div id="error-wrap" class="hidden"></div>
-  <div id="loading">
-    <div class="icon">⬡</div>
-    <div style="font-size:13px;font-family:monospace;">Conectando à Meta Graph API...</div>
-    <div style="font-size:11px;color:#333;margin-top:4px;" id="loading-sub">Buscando campanhas, adsets, anúncios, públicos e pixel</div>
-  </div>
-  <div id="progress-wrap" class="hidden">
-    <div id="progress-label">Carregando...</div>
-    <div id="progress-bar-track"><div id="progress-bar"></div></div>
-  </div>
+  <div id="loading"><div class="icon">⬡</div><div style="font-size:13px;font-family:monospace;">Conectando à Meta Graph API...</div><div style="font-size:11px;color:#333;margin-top:4px;">Selecione um cliente com token configurado</div></div>
+  <div id="progress-wrap" class="hidden"><div id="progress-label">Carregando...</div><div id="progress-bar-track"><div id="progress-bar"></div></div></div>
   <div id="content" class="hidden fade"></div>
-  <!-- Campos ocultos para compatibilidade com app.js -->
-  <input type="hidden" id="cfg-token"/>
-  <input type="hidden" id="cfg-act"/>
-  <div style="margin-top:20px;padding:12px 14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:6px;font-size:12px;color:#333;">
-    ⚙ Para trocar de conta, vá em <strong style="color:#555;">Perfis</strong> e selecione outro cliente.
+  <input type="hidden" id="cfg-token"/><input type="hidden" id="cfg-act"/>
+  <div style="margin-top:16px;padding:10px 14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:6px;font-size:12px;color:#333;">
+    ⚙ Para trocar de conta, vá em <strong style="color:#444;">Perfis</strong> e selecione outro cliente.
   </div>
 </div>
 </div>
 
-<!-- ──────────── CRIATIVO ──────────── -->
+<!-- ══════════ CRIATIVO ══════════ -->
 <div id="tab-criativo" class="tab-panel">
-<div id="main">
-  <div class="section-divider">GERADOR DE BRIEF CRIATIVO</div>
+<div class="main">
+  <div class="sec-divider">GERADOR DE BRIEF CRIATIVO</div>
   <div id="criativo-tone" class="tone-box hidden"></div>
-  <div class="form-group">
-    <label class="form-label">PRODUTO / CAMPANHA</label>
-    <input id="criativo-produto" placeholder="Ex: Lançamento do curso de tráfego pago, R$997"/>
-  </div>
+  <div class="form-group"><label class="form-label">PRODUTO / CAMPANHA</label><input id="criativo-produto" placeholder="Ex: Lançamento do curso de tráfego pago, R$997"/></div>
   <div class="form-row">
-    <div class="form-group" style="margin:0">
-      <label class="form-label">OBJETIVO</label>
-      <select id="criativo-objetivo">
-        <option value="vendas">Vendas</option>
-        <option value="leads">Leads</option>
-        <option value="awareness">Reconhecimento</option>
-        <option value="engajamento">Engajamento</option>
-      </select>
+    <div class="form-group" style="margin:0"><label class="form-label">OBJETIVO</label>
+      <select id="criativo-objetivo"><option value="vendas">Vendas</option><option value="leads">Leads</option><option value="awareness">Reconhecimento</option><option value="engajamento">Engajamento</option></select>
     </div>
-    <div class="form-group" style="margin:0">
-      <label class="form-label">PÚBLICO-ALVO</label>
-      <input id="criativo-publico" placeholder="Ex: Mulheres 25-45, interessadas em beleza"/>
-    </div>
+    <div class="form-group" style="margin:0"><label class="form-label">PÚBLICO-ALVO</label><input id="criativo-publico" placeholder="Ex: Mulheres 25-45, interessadas em beleza"/></div>
   </div>
-  <div class="form-group">
-    <label class="form-label">REFERÊNCIAS / CONTEXTO (opcional)</label>
-    <textarea id="criativo-contexto" style="min-height:70px;" placeholder="Concorrentes, referências visuais, cores da marca, restrições..."></textarea>
-  </div>
-  <button id="btn-criativo" class="btn-primary" onclick="runCriativo()" style="width:100%;margin-bottom:28px;">🎨 Gerar Brief Criativo</button>
+  <div class="form-group"><label class="form-label">REFERÊNCIAS / CONTEXTO (opcional)</label><textarea id="criativo-contexto" style="min-height:70px;" placeholder="Concorrentes, referências visuais, cores da marca..."></textarea></div>
+  <button id="btn-criativo" class="btn-primary" onclick="runCriativo()" style="width:100%;margin-bottom:24px;">🎨 Gerar Brief Criativo</button>
   <div id="criativo-results"></div>
 </div>
 </div>
 
-<!-- ──────────── HISTÓRICO ──────────── -->
+<!-- ══════════ RELATÓRIO ══════════ -->
+<div id="tab-relatorio" class="tab-panel">
+<div class="main">
+  <div class="sec-divider">RELATÓRIO AUTOMÁTICO DO PERÍODO</div>
+  <div id="relatorio-no-data" class="card" style="color:var(--dim);font-size:13px;text-align:center;padding:24px;">
+    📊 Carregue as métricas na aba <strong style="color:var(--txt);">Métricas</strong> primeiro para gerar o relatório com dados reais.
+  </div>
+  <div id="relatorio-form" class="hidden">
+    <div class="form-row">
+      <div class="form-group" style="margin:0"><label class="form-label">PERÍODO</label><input id="relatorio-periodo" placeholder="Ex: Abril 2026"/></div>
+      <div class="form-group" style="margin:0"><label class="form-label">OBSERVAÇÕES EXTRAS (opcional)</label><input id="relatorio-obs" placeholder="Ex: Período de lançamento, alta sazonalidade..."/></div>
+    </div>
+    <button id="btn-relatorio" class="btn-primary" onclick="runRelatorio()" style="width:100%;margin-bottom:20px;">📄 Gerar Relatório Completo</button>
+  </div>
+  <div id="relatorio-output-wrap" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-size:11px;color:var(--dim);">Relatório gerado — pronto para copiar e enviar</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-copy btn-sm" onclick="copyToClipboard(document.getElementById('relatorio-raw').value, this)">📋 Copiar relatório</button>
+        <button class="btn-secondary btn-sm" onclick="runRelatorio()">↻ Regenerar</button>
+      </div>
+    </div>
+    <div id="relatorio-output"></div>
+    <textarea id="relatorio-raw" style="display:none;"></textarea>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ CALCULADORA ══════════ -->
+<div id="tab-calc" class="tab-panel">
+<div class="main">
+  <div class="sec-divider">CALCULADORA DE TRÁFEGO PAGO</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+    <!-- ROAS -->
+    <div class="calc-card">
+      <div class="calc-title">📈 Calculadora de ROAS</div>
+      <div class="form-group"><label class="form-label">INVESTIMENTO (R$)</label><input id="roas-spend" type="number" placeholder="5000" oninput="calcRoas()"/></div>
+      <div class="form-group" style="margin:0"><label class="form-label">RECEITA GERADA (R$)</label><input id="roas-revenue" type="number" placeholder="20000" oninput="calcRoas()"/></div>
+      <div class="calc-result" id="roas-result" style="display:none;">
+        <div class="calc-result-row"><span class="cr-k">ROAS</span><span class="cr-v" id="roas-val" style="color:var(--green);">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">Lucro sobre investimento</span><span class="cr-v" id="roas-profit">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">Retorno %</span><span class="cr-v" id="roas-pct">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">Status</span><span class="cr-v" id="roas-status">—</span></div>
+      </div>
+    </div>
+
+    <!-- CPL / LEADS -->
+    <div class="calc-card">
+      <div class="calc-title">🎯 Planejador de Leads</div>
+      <div class="form-group"><label class="form-label">BUDGET (R$)</label><input id="cpl-budget" type="number" placeholder="3000" oninput="calcCpl()"/></div>
+      <div class="form-group"><label class="form-label">CPL ALVO (R$)</label><input id="cpl-alvo" type="number" placeholder="25" oninput="calcCpl()"/></div>
+      <div class="form-group" style="margin:0"><label class="form-label">TAXA DE CONVERSÃO LEADS→CLIENTES (%)</label><input id="cpl-conv" type="number" placeholder="5" oninput="calcCpl()"/></div>
+      <div class="calc-result" id="cpl-result" style="display:none;">
+        <div class="calc-result-row"><span class="cr-k">Leads esperados</span><span class="cr-v" id="cpl-leads" style="color:var(--blue);">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">Clientes esperados</span><span class="cr-v" id="cpl-clients">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">CPL real pelo budget</span><span class="cr-v" id="cpl-real">—</span></div>
+      </div>
+    </div>
+
+    <!-- BREAK-EVEN -->
+    <div class="calc-card">
+      <div class="calc-title">⚖️ Break-even de Campanha</div>
+      <div class="form-group"><label class="form-label">TICKET MÉDIO (R$)</label><input id="be-ticket" type="number" placeholder="197" oninput="calcBreakeven()"/></div>
+      <div class="form-group"><label class="form-label">MARGEM LÍQUIDA (%)</label><input id="be-margin" type="number" placeholder="40" oninput="calcBreakeven()"/></div>
+      <div class="form-group" style="margin:0"><label class="form-label">INVESTIMENTO (R$)</label><input id="be-spend" type="number" placeholder="5000" oninput="calcBreakeven()"/></div>
+      <div class="calc-result" id="be-result" style="display:none;">
+        <div class="calc-result-row"><span class="cr-k">Vendas p/ break-even</span><span class="cr-v" id="be-vendas" style="color:var(--acc);">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">CPA máximo sustentável</span><span class="cr-v" id="be-cpa-max">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">ROAS mínimo necessário</span><span class="cr-v" id="be-roas-min">—</span></div>
+      </div>
+    </div>
+
+    <!-- ESCALA -->
+    <div class="calc-card">
+      <div class="calc-title">🚀 Projeção de Escala</div>
+      <div class="form-group"><label class="form-label">INVESTIMENTO ATUAL (R$)</label><input id="esc-spend" type="number" placeholder="5000" oninput="calcEscala()"/></div>
+      <div class="form-group"><label class="form-label">RECEITA ATUAL (R$)</label><input id="esc-revenue" type="number" placeholder="20000" oninput="calcEscala()"/></div>
+      <div class="form-group"><label class="form-label">CONVERSÕES ATUAIS</label><input id="esc-conv" type="number" placeholder="50" oninput="calcEscala()"/></div>
+      <div class="form-group" style="margin:0"><label class="form-label">NOVO INVESTIMENTO (R$)</label><input id="esc-new-spend" type="number" placeholder="10000" oninput="calcEscala()"/></div>
+      <div class="calc-result" id="esc-result" style="display:none;">
+        <div class="calc-result-row"><span class="cr-k">Receita projetada</span><span class="cr-v" id="esc-proj-rev" style="color:var(--green);">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">Conversões projetadas</span><span class="cr-v" id="esc-proj-conv">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">ROAS mantido</span><span class="cr-v" id="esc-roas">—</span></div>
+        <div class="calc-result-row"><span class="cr-k">Aumento de escala</span><span class="cr-v" id="esc-pct">—</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════ SWIPE FILE ══════════ -->
+<div id="tab-swipe" class="tab-panel">
+<div class="main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <div class="sec-divider" style="margin:0;border:none;padding:0;">SWIPE FILE — COPIES QUE FUNCIONAM</div>
+    <button onclick="openNewSwipeModal()" class="btn-primary btn-sm">+ Adicionar Copy</button>
+  </div>
+  <div class="swipe-filters" id="swipe-filters"></div>
+  <div id="swipe-list"></div>
+</div>
+</div>
+
+<!-- ══════════ HISTÓRICO ══════════ -->
 <div id="tab-historico" class="tab-panel">
-<div id="main">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-    <div class="section-divider" style="margin:0;border:none;padding:0;">HISTÓRICO DE GERAÇÃO</div>
-    <button onclick="clearHistory()" style="padding:6px 14px;background:#130707;border:1px solid #2a1010;color:#6b3030;font-size:12px;">Limpar tudo</button>
+<div class="main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div class="sec-divider" style="margin:0;border:none;padding:0;">HISTÓRICO DE GERAÇÃO</div>
+    <button onclick="clearHistory()" style="padding:5px 12px;background:#130707;border:1px solid #2a1010;color:#6b3030;font-size:11px;border-radius:6px;">Limpar tudo</button>
   </div>
   <div id="historico-list"></div>
 </div>
 </div>
 
-<!-- ──────────── PERFIS ──────────── -->
+<!-- ══════════ PERFIS ══════════ -->
 <div id="tab-perfis" class="tab-panel">
-<div id="main">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-    <div class="section-divider" style="margin:0;border:none;padding:0;">CLIENTES E PERFIS</div>
-    <button onclick="openNewClientModal()" class="btn-primary" style="padding:8px 16px;font-size:12px;">+ Novo Cliente</button>
+<div class="main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div class="sec-divider" style="margin:0;border:none;padding:0;">CLIENTES E PERFIS</div>
+    <button onclick="openNewClientModal()" class="btn-primary btn-sm">+ Novo Cliente</button>
   </div>
   <div id="perfis-list"></div>
 </div>
@@ -410,53 +485,22 @@ select option { background: #111; }
   <div class="modal">
     <h3 id="modal-client-title">Novo Cliente</h3>
     <input type="hidden" id="modal-client-id"/>
-    <div class="form-group">
-      <label class="form-label">NOME DO CLIENTE *</label>
-      <input id="mc-name" placeholder="Ex: Viva Beauty, Arena Suplementos..."/>
-    </div>
+    <div class="form-group"><label class="form-label">NOME *</label><input id="mc-name" placeholder="Ex: Viva Beauty"/></div>
     <div class="form-row">
-      <div class="form-group" style="margin:0">
-        <label class="form-label">NICHO</label>
-        <input id="mc-niche" placeholder="Ex: Cosméticos, Suplementos, Imóveis..."/>
-      </div>
-      <div class="form-group" style="margin:0">
-        <label class="form-label">TIPO DE NEGÓCIO</label>
-        <select id="mc-type">
-          <option value="ecommerce">E-commerce</option>
-          <option value="b2b">B2B / Serviços</option>
-          <option value="local">Negócio Local</option>
-          <option value="infoproduto">Infoproduto</option>
-          <option value="saas">SaaS</option>
-        </select>
+      <div class="form-group" style="margin:0"><label class="form-label">NICHO</label><input id="mc-niche" placeholder="Ex: Cosméticos"/></div>
+      <div class="form-group" style="margin:0"><label class="form-label">TIPO</label>
+        <select id="mc-type"><option value="ecommerce">E-commerce</option><option value="b2b">B2B / Serviços</option><option value="local">Negócio Local</option><option value="infoproduto">Infoproduto</option><option value="saas">SaaS</option></select>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">TOM DE VOZ</label>
-      <textarea id="mc-tone" style="min-height:70px;" placeholder="Ex: Feminino, empoderador, científico mas acessível. Prova social e dados. Premium próximo. Sem promessas..."></textarea>
-    </div>
+    <div class="form-group"><label class="form-label">TOM DE VOZ</label><textarea id="mc-tone" style="min-height:70px;" placeholder="Ex: Feminino, empoderador, científico mas acessível..."></textarea></div>
     <div class="form-row">
-      <div class="form-group" style="margin:0">
-        <label class="form-label">BUDGET MENSAL</label>
-        <input id="mc-budget" placeholder="Ex: R$5-10k/mês"/>
-      </div>
-      <div class="form-group" style="margin:0">
-        <label class="form-label">OBJETIVO PRINCIPAL</label>
-        <select id="mc-objective">
-          <option value="vendas">Vendas</option>
-          <option value="leads">Leads</option>
-          <option value="trafego">Tráfego</option>
-          <option value="awareness">Reconhecimento</option>
-        </select>
+      <div class="form-group" style="margin:0"><label class="form-label">BUDGET MENSAL</label><input id="mc-budget" placeholder="Ex: R$5-10k/mês"/></div>
+      <div class="form-group" style="margin:0"><label class="form-label">OBJETIVO</label>
+        <select id="mc-objective"><option value="vendas">Vendas</option><option value="leads">Leads</option><option value="trafego">Tráfego</option><option value="awareness">Reconhecimento</option></select>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">META ADS TOKEN</label>
-      <input id="mc-token" placeholder="EAAK..." type="password"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">AD ACCOUNT ID</label>
-      <input id="mc-account" placeholder="act_..."/>
-    </div>
+    <div class="form-group"><label class="form-label">META ADS TOKEN</label><input id="mc-token" type="password" placeholder="EAAK..."/></div>
+    <div class="form-group"><label class="form-label">AD ACCOUNT ID</label><input id="mc-account" placeholder="act_..."/></div>
     <div class="modal-actions">
       <button onclick="closeClientModal()" class="btn-secondary">Cancelar</button>
       <button onclick="saveClient()" class="btn-primary">Salvar</button>
@@ -464,14 +508,36 @@ select option { background: #111; }
   </div>
 </div>
 
-<!-- MODAL RESULTADO HISTÓRICO -->
-<div id="modal-hist" class="modal-overlay hidden">
-  <div class="modal" style="max-width:720px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <h3 id="modal-hist-title" style="margin:0;font-size:14px;">Resultado</h3>
-      <button onclick="closeHistModal()" style="padding:6px 12px;background:none;border:1px solid var(--brd);color:var(--dim);font-size:12px;">✕ Fechar</button>
+<!-- MODAL SWIPE -->
+<div id="modal-swipe" class="modal-overlay hidden">
+  <div class="modal">
+    <h3 id="modal-swipe-title">Adicionar ao Swipe File</h3>
+    <input type="hidden" id="modal-swipe-id"/>
+    <div class="form-group"><label class="form-label">HEADLINE *</label><input id="sw-headline" placeholder="Ex: Você sabia que 90% das pessoas..."/></div>
+    <div class="form-group"><label class="form-label">TEXTO PRINCIPAL</label><textarea id="sw-body" style="min-height:80px;" placeholder="Corpo do anúncio..."></textarea></div>
+    <div class="form-group"><label class="form-label">CTA</label><input id="sw-cta" placeholder="Ex: Quero saber mais, Comprar agora..."/></div>
+    <div class="form-row">
+      <div class="form-group" style="margin:0"><label class="form-label">NICHO / CATEGORIA</label><input id="sw-niche" placeholder="Ex: Saúde, Beleza, Finanças..."/></div>
+      <div class="form-group" style="margin:0"><label class="form-label">FORMATO</label>
+        <select id="sw-format"><option value="feed">Feed</option><option value="stories">Stories</option><option value="reels">Reels</option><option value="carrossel">Carrossel</option></select>
+      </div>
     </div>
-    <div id="modal-hist-body" style="font-size:13px;line-height:1.7;color:#b8b4ae;white-space:pre-wrap;max-height:65vh;overflow-y:auto;"></div>
+    <div class="form-group"><label class="form-label">RESULTADO / NOTA (opcional)</label><input id="sw-result" placeholder="Ex: CTR 4.2%, 230 leads, ROAS 5.1x..."/></div>
+    <div class="modal-actions">
+      <button onclick="closeSwipeModal()" class="btn-secondary">Cancelar</button>
+      <button onclick="saveSwipe()" class="btn-primary">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HISTÓRICO -->
+<div id="modal-hist" class="modal-overlay hidden">
+  <div class="modal" style="max-width:700px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h3 id="modal-hist-title" style="margin:0;font-size:14px;"></h3>
+      <button onclick="closeHistModal()" style="padding:4px 10px;background:none;border:1px solid var(--brd);color:var(--dim);font-size:12px;border-radius:4px;">✕</button>
+    </div>
+    <div id="modal-hist-body" style="font-size:13px;line-height:1.7;color:#b8b4ae;max-height:65vh;overflow-y:auto;"></div>
   </div>
 </div>
 
