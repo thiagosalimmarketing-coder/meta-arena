@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/meta", "destination": "/api/meta.js" }
+  ]
+}
