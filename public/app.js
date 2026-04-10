@@ -489,39 +489,37 @@ async function fetchAll() {
   const dp = document.getElementById('date-preset').value;
 
   try {
-    setProgress(10, 'Buscando dados da conta...');
-    const account = await mFetch(`${META_ACT}`, { fields: 'name,account_status,currency,timezone_name,amount_spent,balance' });
+    setProgress(15, 'Conectando à API Meta...');
 
-    setProgress(25, 'Buscando insights...');
-    const acctIns = await mFetch(`${META_ACT}/insights`, { fields: INSIGHT_FIELDS, date_preset: dp, level: 'account' });
-
-    setProgress(40, 'Buscando campanhas...');
-    const campsR = await mFetch(`${META_ACT}/campaigns`, {
-      fields: `id,name,status,objective,daily_budget,lifetime_budget,budget_remaining,insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit: 50,
-    });
-
-    setProgress(55, 'Buscando conjuntos...');
-    const adsetsR = await mFetch(`${META_ACT}/adsets`, {
-      fields: `id,name,status,campaign_id,targeting,daily_budget,optimization_goal,insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit: 100,
-    });
-
-    setProgress(70, 'Buscando anúncios...');
-    const adsR = await mFetch(`${META_ACT}/ads`, {
-      fields: `id,name,status,adset_id,campaign_id,creative{id,name,title,body,image_url,thumbnail_url,call_to_action_type},insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit: 100,
-    });
-
-    setProgress(82, 'Buscando públicos...');
-    let audiences = [];
-    try { const a = await mFetch(`${META_ACT}/customaudiences`, { fields: 'id,name,subtype,approximate_count_lower_bound', limit: 50 }); audiences = a.data || []; } catch {}
-
-    setProgress(92, 'Buscando pixel...');
-    let pixels = [];
-    try { const p = await mFetch(`${META_ACT}/adspixels`, { fields: 'id,name,last_fired_time', limit: 10 }); pixels = p.data || []; } catch {}
+    // Dispara todas as chamadas em paralelo
+    const [account, acctIns, campsR, adsetsR, adsR, audiencesR, pixelsR] = await Promise.all([
+      mFetch(`${META_ACT}`, { fields: 'name,account_status,currency,timezone_name,amount_spent,balance' }),
+      mFetch(`${META_ACT}/insights`, { fields: INSIGHT_FIELDS, date_preset: dp, level: 'account' }),
+      mFetch(`${META_ACT}/campaigns`, {
+        fields: `id,name,status,objective,daily_budget,lifetime_budget,budget_remaining,insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit: 50,
+      }),
+      mFetch(`${META_ACT}/adsets`, {
+        fields: `id,name,status,campaign_id,targeting,daily_budget,optimization_goal,insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit: 100,
+      }),
+      mFetch(`${META_ACT}/ads`, {
+        fields: `id,name,status,adset_id,campaign_id,creative{id,name,title,body,image_url,thumbnail_url,call_to_action_type},insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit: 100,
+      }),
+      mFetch(`${META_ACT}/customaudiences`, { fields: 'id,name,subtype,approximate_count_lower_bound', limit: 50 }).catch(() => ({ data: [] })),
+      mFetch(`${META_ACT}/adspixels`, { fields: 'id,name,last_fired_time', limit: 10 }).catch(() => ({ data: [] })),
+    ]);
 
     setProgress(100, 'Concluído ✓');
-    await new Promise(r => setTimeout(r, 250));
+    await new Promise(r => setTimeout(r, 150));
 
-    const data = { account, acctIns, camps: campsR.data || [], adsets: adsetsR.data || [], ads: adsR.data || [], audiences, pixels, dp };
+    const data = {
+      account, acctIns,
+      camps: campsR.data || [],
+      adsets: adsetsR.data || [],
+      ads: adsR.data || [],
+      audiences: audiencesR.data || [],
+      pixels: pixelsR.data || [],
+      dp,
+    };
     renderAll(data);
     runDiagnostico(data);
   } catch (e) {
