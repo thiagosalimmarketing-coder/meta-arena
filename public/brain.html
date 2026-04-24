@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VÓRTEX · Brain System</title>
+<style>
+  :root{--bg:#090909;--surf:#0f0f0f;--surf2:#111;--brd:#1c1c1c;--brd2:#222;
+    --txt:#ebe7e1;--dim:#555;--dim2:#333;--acc:#d4956a;--green:#5bad85;--red:#e07070;
+    --purple:#9b7dbf;--vortex:#b57dbf;--blue:#6a8eb5;--yellow:#d4c06a;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:Georgia,serif;font-size:14px;min-height:100vh}
+  input,select,textarea{background:var(--surf);border:1px solid var(--brd);color:var(--txt);
+    padding:9px 13px;border-radius:7px;font-size:13px;outline:none;font-family:Georgia,serif;
+    transition:border-color .15s;width:100%}
+  input:focus,select:focus,textarea:focus{border-color:var(--acc)}
+  button{cursor:pointer;font-family:Georgia,serif;font-weight:600;border:none;
+    border-radius:6px;transition:all .15s;font-size:12.5px}
+  button:hover:not(:disabled){opacity:.82}
+  button:disabled{opacity:.35;cursor:not-allowed}
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+  select option{background:#111;color:var(--txt)}
+  textarea{resize:vertical;line-height:1.7}
+
+  #nav{border-bottom:1px solid var(--brd);padding:13px 24px;display:flex;
+    align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .nav-sub{font-size:10px;letter-spacing:.35em;color:#282828;text-transform:uppercase;margin-bottom:2px}
+  .nav-title{font-size:17px;font-weight:400}
+  .nav-links{display:flex;gap:5px;flex-wrap:wrap}
+  .nav-link{padding:6px 13px;border-radius:6px;font-size:12px;font-family:monospace;
+    text-decoration:none;display:inline-flex;align-items:center;transition:all .15s;border:none;cursor:pointer}
+
+  #main{max-width:960px;margin:0 auto;padding:24px 20px}
+
+  .tabs{display:flex;gap:3px;border-bottom:1px solid var(--brd);margin-bottom:24px;overflow-x:auto}
+  .tab{padding:9px 18px;border:none;background:transparent;color:var(--dim);font-family:monospace;
+    font-size:12.5px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+    transition:all .15s;white-space:nowrap}
+  .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:18px}
+  .stat-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;text-align:center}
+  .stat-lbl{font-size:10px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:5px}
+  .stat-val{font-size:22px;font-family:monospace;font-weight:600}
+
+  .filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .pill-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px}
+  .pill{padding:4px 11px;border-radius:20px;font-size:12px;font-family:monospace;cursor:pointer;
+    transition:all .15s;border:1px solid var(--brd);background:transparent;color:var(--dim)}
+  .pill.active{border-color:var(--acc);background:#d4956a15;color:var(--acc)}
+
+  .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+  .note-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;
+    padding:14px 16px;cursor:pointer;transition:border-color .2s;border-left:3px solid var(--brd)}
+  .note-card:hover{border-left-width:3px;opacity:.9}
+  .note-meta{font-size:10px;font-family:monospace;color:var(--dim);margin-bottom:5px}
+  .note-title{font-size:13.5px;color:var(--txt);margin-bottom:6px;line-height:1.3}
+  .note-preview{font-size:11.5px;color:var(--dim);line-height:1.5;overflow:hidden;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .note-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+  .tag{font-size:10px;padding:2px 7px;background:#d4956a12;color:var(--acc);border-radius:12px;font-family:monospace}
+
+  .note-content{background:var(--surf);border:1px solid var(--brd);border-radius:8px;
+    padding:20px;line-height:1.85;font-size:13.5px;color:#c0bbb5;white-space:pre-wrap;font-family:Georgia,serif}
+
+  .form-grid{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+  .form-grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px}
+  .form-label{display:block;font-size:10.5px;letter-spacing:.18em;color:var(--dim);
+    text-transform:uppercase;margin-bottom:6px}
+
+  .btn{padding:9px 18px}
+  .btn-primary{background:var(--acc);color:#080808}
+  .btn-ghost{background:transparent;border:1px solid var(--brd2);color:var(--dim)}
+  .btn-danger{background:#e0707015;border:1px solid #e0707035;color:#e07070}
+  .btn-purple{background:#9b7dbf15;border:1px solid #9b7dbf35;color:#9b7dbf}
+  .btn-green{background:#5bad8518;border:1px solid #5bad8535;color:#5bad85}
+  .btn-sm{padding:5px 12px;font-size:11.5px}
+  .btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+
+  /* AI RESULT */
+  .ai-result-box{background:var(--surf);border-left:3px solid var(--purple);border-radius:0 8px 8px 0;
+    padding:20px;line-height:1.9;font-size:13px;color:#c0bbb5;white-space:pre-wrap;font-family:Georgia,serif}
+
+  /* GROWTH AUDIT */
+  .audit-layer{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:14px 16px;margin-bottom:8px}
+  .audit-layer-title{font-size:10.5px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .audit-layer-title span{color:var(--acc)}
+  .audit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:600px){.audit-grid,.form-grid{grid-template-columns:1fr}}
+
+  /* STATUS BADGE */
+  .badge{padding:4px 12px;border-radius:20px;font-size:12px;font-family:monospace;font-weight:600;display:inline-block}
+  .badge-ok{background:#5bad8520;border:1px solid #5bad8540;color:#5bad85}
+  .badge-warn{background:#d4c06a20;border:1px solid #d4c06a40;color:#d4c06a}
+  .badge-crit{background:#e0707020;border:1px solid #e0707040;color:#e07070}
+
+  /* CONTEXT INFO */
+  .context-info{margin-top:16px;padding:11px 14px;background:var(--surf2);border:1px solid var(--brd);
+    border-radius:7px;font-size:11.5px;color:var(--dim);line-height:1.6}
+
+  .mode-pill{padding:8px 14px;border-radius:6px;font-size:12px;font-family:monospace;
+    cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--dim);transition:all .15s;text-align:left}
+  .mode-pill.active{border-color:var(--acc);background:#d4956a12;color:var(--acc)}
+  .mode-pill-desc{font-size:10.5px;color:var(--dim2);margin-top:2px;font-family:monospace}
+
+  /* GROWTH mode highlight */
+  .mode-pill.growth-active{border-color:var(--green);background:#5bad8512;color:var(--green)}
+
+  .loading{color:var(--yellow);font-family:monospace;font-size:12.5px;padding:14px 16px;
+    background:var(--surf);border:1px solid var(--brd);border-radius:8px;animation:pulse 1.5s infinite}
+  .section-title{font-size:10.5px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;
+    margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .section-title span{color:var(--acc)}
+  .empty{text-align:center;padding:40px 20px;color:var(--dim2)}
+  .empty .ico{font-size:28px;margin-bottom:8px}
+
+  /* PLAN GRID */
+  .plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:10px}
+  .plan-day{background:var(--surf2);border:1px solid var(--brd);border-radius:6px;padding:8px 10px;font-size:11px;font-family:monospace}
+  .plan-day-num{color:var(--acc);font-weight:600;margin-bottom:4px}
+
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .fade{animation:fadeIn .3s ease}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <div style="cursor:pointer" onclick="location.href='/index.html'">
+    <div class="nav-sub">VÓRTEX · INTELLIGENCE PLATFORM</div>
+    <div class="nav-title">◈ VÓRTEX · Brain</div></div>
+  </div>
+  <div class="nav-links">
+    <a href="/index.html" class="nav-link" style="background:transparent;border:1px solid var(--brd2);color:var(--dim);">← Dashboard</a>
+    <a href="/squads.html" style="padding:6px 13px;border-radius:6px;background:#e0707015;border:1px solid #e0707030;color:#e07070;font-size:12px;font-family:monospace;text-decoration:none">⚡ Squads</a>
+    <a href="/utm.html" style="padding:6px 13px;border-radius:6px;background:#d4956a15;border:1px solid #d4956a30;color:#d4956a;font-size:12px;font-family:monospace;text-decoration:none">📎 UTM</a>
+    <a href="/protector.html" class="nav-link" style="background:#e0707015;border:1px solid #e0707030;color:#e07070;">🛡 Protector</a>
+    <a href="/tracker.html" class="nav-link" style="background:#6a8eb515;border:1px solid #6a8eb530;color:#6a8eb5;">🔬 Tracking</a>
+    <a href="/demographics.html" class="nav-link" style="background:#9b7dbf15;border:1px solid #9b7dbf30;color:#9b7dbf;">📊 Demográficos</a>
+  </div>
+</div>
+
+<div id="main">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('base')">📚 Base de Conhecimento</button>
+    <button class="tab" onclick="showTab('ai')">⚡ Consultar IA</button>
+    <button class="tab" onclick="showTab('audit')">🔬 Growth Audit</button>
+    <button class="tab" onclick="showTab('campaign')">📊 Analisar Campanha</button>
+  </div>
+
+  <!-- ─────────────────────────── BASE ─────────────────────────── -->
+  <div id="tab-base">
+    <div class="stats-grid" id="stats-row"></div>
+    <div class="filters">
+      <div style="flex:1;min-width:180px">
+        <input id="search-q" placeholder="⌕ Buscar em todas as notas..." oninput="renderNotes()" style="font-size:12.5px"/>
+      </div>
+      <select id="filter-client" onchange="renderNotes()" style="width:auto;cursor:pointer;padding:9px 12px">
+        <option>Todos</option><option>Arena Publicidade</option><option>Nova Beach</option><option>Geral</option>
+      </select>
+      <button class="btn btn-purple" style="padding:9px 16px" onclick="openNew()">+ Nova Nota</button>
+    </div>
+    <div class="pill-row" id="cat-pills"></div>
+    <div id="notes-grid" class="notes-grid"></div>
+  </div>
+
+  <!-- ─────────────────────────── NOTE VIEW ─────────────────────── -->
+  <div id="tab-note" class="hidden">
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" onclick="showTab('base')">← Voltar</button>
+      <button class="btn btn-ghost btn-sm" onclick="openEdit()">✎ Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCurrentNote()">✕ Remover</button>
+      <button class="btn btn-purple btn-sm" onclick="sendNoteToAI()">⚡ Consultar IA sobre esta nota</button>
+    </div>
+    <div id="note-badges" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
+    <div id="note-title" style="font-size:20px;font-weight:400;margin-bottom:16px;line-height:1.3"></div>
+    <div id="note-body" class="note-content"></div>
+  </div>
+
+  <!-- ─────────────────────────── EDIT ──────────────────────────── -->
+  <div id="tab-edit" class="hidden">
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" onclick="cancelEdit()">← Cancelar</button>
+      <button class="btn btn-primary btn-sm" id="btn-save" onclick="saveCurrentNote()">✓ Salvar</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div><label class="form-label">Título *</label><input id="edit-title" placeholder="Título da nota..."/></div>
+      <div class="form-grid">
+        <div><label class="form-label">Cliente</label>
+          <select id="edit-client" style="cursor:pointer">
+            <option>Arena Publicidade</option><option>Nova Beach</option><option>Geral</option>
+          </select></div>
+        <div><label class="form-label">Categoria</label>
+          <select id="edit-category" style="cursor:pointer">
+            <option>Clientes</option><option>Benchmarks</option><option>Estratégias</option>
+            <option>Frameworks</option><option>Campanhas</option><option>Criativos</option><option>Notas</option>
+          </select></div>
+      </div>
+      <div><label class="form-label">Tags (vírgula)</label><input id="edit-tags" placeholder="meta, CTR, campanha..."/></div>
+      <div><label class="form-label">Conteúdo *</label>
+        <textarea id="edit-content" rows="16" style="font-family:'Courier New',monospace;font-size:12.5px"
+          placeholder="Use ## para seções, - para listas, | col | para tabelas..."></textarea></div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────── AI CONSULT ───────────────────── -->
+  <div id="tab-ai" class="hidden">
+    <div style="margin-bottom:20px">
+      <div class="section-title"><span>⚡</span> Consultar Brain com IA</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.6" id="ai-ctx-count"></div>
+    </div>
+
+    <!-- Mode selector -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin-bottom:18px">
+      <button class="mode-pill active" id="mode-consult" onclick="setMode('consult')">
+        <div>💬 Consultar</div><div class="mode-pill-desc">Pergunta geral com contexto completo</div>
+      </button>
+      <button class="mode-pill" id="mode-strategy" onclick="setMode('strategy')">
+        <div>🎯 Estratégia</div><div class="mode-pill-desc">Cria estratégia baseada nos perfis</div>
+      </button>
+      <button class="mode-pill" id="mode-copy" onclick="setMode('copy')">
+        <div>✍ Copy</div><div class="mode-pill-desc">Gera copies e headlines para anúncios</div>
+      </button>
+      <button class="mode-pill" id="mode-growth" onclick="setMode('growth')">
+        <div>🔬 Head de Growth</div><div class="mode-pill-desc">Diagnóstico profundo das 9 camadas</div>
+      </button>
+    </div>
+
+    <div style="margin-bottom:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <label class="form-label" style="margin:0">Sua pergunta</label>
+      <span id="mode-badge" style="font-size:10.5px;font-family:monospace;padding:2px 8px;border-radius:4px;background:#d4956a15;color:var(--acc);border:1px solid #d4956a30">Consultar</span>
+    </div>
+    <textarea id="ai-query" rows="5" style="margin-bottom:12px"
+      placeholder="Ex: Qual o tom de voz ideal para a Arena Publicidade em LinkedIn Ads?"></textarea>
+
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="runAI()" id="btn-ai" style="padding:11px 24px">⚡ Consultar Brain</button>
+      <button class="btn btn-ghost" onclick="clearAI()">Limpar</button>
+    </div>
+
+    <div id="ai-loading" class="loading hidden">Lendo notas do Brain e processando...</div>
+    <div id="ai-result" class="hidden fade">
+      <div class="ai-result-box" id="ai-result-text"></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-ghost btn-sm" onclick="copyText('ai-result-text')">Copiar</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveResultAsNote('ai')">Salvar no Brain</button>
+      </div>
+    </div>
+    <div class="context-info" id="ctx-list"></div>
+  </div>
+
+  <!-- ─────────────────────────── GROWTH AUDIT ─────────────────── -->
+  <div id="tab-audit" class="hidden">
+    <div style="margin-bottom:20px">
+      <div class="section-title"><span>🔬</span> Growth Audit — 9 Camadas</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.65">
+        Diagnóstico profundo do sistema de marketing. Preencha o que souber — quanto mais contexto, mais preciso o diagnóstico.
+      </div>
+    </div>
+
+    <!-- CLIENT + STATUS -->
+    <div class="form-grid" style="margin-bottom:14px">
+      <div><label class="form-label">Cliente / Sistema auditado</label>
+        <select id="audit-client" style="cursor:pointer">
+          <option>Arena Publicidade</option><option>Nova Beach</option><option>Geral</option>
+        </select></div>
+      <div><label class="form-label">Objetivo principal</label>
+        <select id="audit-obj" style="cursor:pointer">
+          <option>Aumentar volume de leads</option>
+          <option>Reduzir CPA / CPL</option>
+          <option>Aumentar ROAS</option>
+          <option>Preparar para escala</option>
+          <option>Corrigir queda de performance</option>
+          <option>Diagnóstico geral</option>
+        </select></div>
+    </div>
+
+    <!-- 9 LAYERS INPUT -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+
+      <div class="audit-layer">
+        <div class="audit-layer-title"><span>1</span> ESTRATÉGIA & OFERTA</div>
+        <div class="audit-grid">
+          <div><label class="form-label" style="font-size:9.5px">Qual a oferta principal?</label>
+            <input id="a-oferta" placeholder="Ex: Geração de lead para reunião comercial"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Qual o diferencial que você comunica?</label>
+            <input id="a-diferencial" placeholder="Ex: Parceiro estratégico, não fornecedor"/></div>
+        </div>
+      </div>
+
+      <div class="audit-layer">
+        <div class="audit-layer-title"><span>2</span> PÚBLICO & POSICIONAMENTO</div>
+        <div class="audit-grid">
+          <div><label class="form-label" style="font-size:9.5px">Público atual nas campanhas</label>
+            <input id="a-publico" placeholder="Ex: Broad 25-55, interesses em marketing corporativo"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Problema de posicionamento percebido</label>
+            <input id="a-posicionamento" placeholder="Ex: Confundido com fornecedor de brindes"/></div>
+        </div>
+      </div>
+
+      <div class="audit-layer">
+        <div class="audit-layer-title"><span>3</span> CRIATIVOS & COPY</div>
+        <div class="audit-grid">
+          <div><label class="form-label" style="font-size:9.5px">Formatos em uso</label>
+            <input id="a-formatos" placeholder="Ex: Carrossel, vídeo 15s, imagem estática"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Última troca de criativo</label>
+            <input id="a-criativo-data" placeholder="Ex: Há 30 dias / nunca troquei"/></div>
+        </div>
+      </div>
+
+      <div class="audit-layer">
+        <div class="audit-layer-title"><span>4</span> FUNIL & UX</div>
+        <div class="audit-grid">
+          <div><label class="form-label" style="font-size:9.5px">Onde o lead cai após clicar?</label>
+            <input id="a-destino" placeholder="Ex: Landing page / formulário nativo / WhatsApp"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Taxa de conversão atual (se souber)</label>
+            <input id="a-conv" placeholder="Ex: 2% da LP / 30% do form nativo"/></div>
+        </div>
+      </div>
+
+      <div class="audit-layer">
+        <div class="audit-layer-title"><span>5</span> DADOS & INFRAESTRUTURA</div>
+        <div class="audit-grid">
+          <div><label class="form-label" style="font-size:9.5px">Pixel / tracking configurado?</label>
+            <input id="a-tracking" placeholder="Ex: Pixel ativo, CAPI não configurado"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Qual evento está otimizando?</label>
+            <input id="a-evento" placeholder="Ex: Lead / Purchase / View Content"/></div>
+        </div>
+      </div>
+
+      <div class="audit-layer">
+        <div class="audit-layer-title"><span>6</span> MÉTRICAS ATUAIS</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">
+          <div><label class="form-label" style="font-size:9.5px">Gasto/mês (R$)</label><input id="a-spend" placeholder="Ex: 3000"/></div>
+          <div><label class="form-label" style="font-size:9.5px">CTR (%)</label><input id="a-ctr" placeholder="Ex: 0.8"/></div>
+          <div><label class="form-label" style="font-size:9.5px">CPL / CPA (R$)</label><input id="a-cpl" placeholder="Ex: 120"/></div>
+          <div><label class="form-label" style="font-size:9.5px">ROAS</label><input id="a-roas" placeholder="Ex: 2.1"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Frequência</label><input id="a-freq" placeholder="Ex: 3.8"/></div>
+          <div><label class="form-label" style="font-size:9.5px">CPM (R$)</label><input id="a-cpm" placeholder="Ex: 48"/></div>
+        </div>
+      </div>
+
+      <div class="audit-layer">
+        <div class="audit-layer-title"><span>7</span> CONTEXTO ADICIONAL</div>
+        <textarea id="a-contexto" rows="4"
+          placeholder="Descreva livremente o que está acontecendo: queda de performance, dificuldade em escalar, problema específico, histórico relevante..."></textarea>
+      </div>
+
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-green" onclick="runAudit()" id="btn-audit" style="padding:11px 26px">🔬 Executar Growth Audit</button>
+      <button class="btn btn-ghost" onclick="clearAudit()">Limpar</button>
+    </div>
+
+    <div id="audit-loading" class="loading hidden" style="margin-top:16px">
+      Analisando sistema nas 9 camadas... identificando gargalos e oportunidades...
+    </div>
+
+    <div id="audit-result" class="hidden fade" style="margin-top:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="font-size:10.5px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase">Growth Audit Report</div>
+        <span id="audit-status-badge" class="badge"></span>
+        <span id="audit-client-badge" style="font-size:11px;font-family:monospace;color:var(--dim)"></span>
+      </div>
+      <div class="ai-result-box" style="border-left-color:var(--green)" id="audit-result-text"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="copyText('audit-result-text')">Copiar Relatório</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveResultAsNote('audit')">Salvar no Brain</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────── CAMPAIGN ANALYSIS ────────────── -->
+  <div id="tab-campaign" class="hidden">
+    <div style="margin-bottom:18px">
+      <div class="section-title"><span>📊</span> Análise Rápida de Campanha</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.6">
+        Cole as métricas. A IA cruza com benchmarks do Brain e classifica SAUDÁVEL / ALERTA / CRÍTICO.
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-grid">
+        <div><label class="form-label">Nome da Campanha</label>
+          <input id="camp-name" placeholder="Ex: Arena — Lead Gen LinkedIn Q2"/></div>
+        <div><label class="form-label">Cliente</label>
+          <select id="camp-client" style="cursor:pointer">
+            <option>Arena Publicidade</option><option>Nova Beach</option><option>Geral</option>
+          </select></div>
+      </div>
+
+      <div><label class="form-label">Métricas</label>
+        <div class="form-grid-3">
+          <div><label class="form-label" style="font-size:9.5px">Gasto (R$)</label><input id="m-spend" placeholder="Ex: 1500"/></div>
+          <div><label class="form-label" style="font-size:9.5px">CTR (%)</label><input id="m-ctr" placeholder="Ex: 1.2"/></div>
+          <div><label class="form-label" style="font-size:9.5px">CPC (R$)</label><input id="m-cpc" placeholder="Ex: 3.50"/></div>
+          <div><label class="form-label" style="font-size:9.5px">CPM (R$)</label><input id="m-cpm" placeholder="Ex: 42"/></div>
+          <div><label class="form-label" style="font-size:9.5px">ROAS</label><input id="m-roas" placeholder="Ex: 2.8"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Frequência</label><input id="m-freq" placeholder="Ex: 3.2"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Leads</label><input id="m-leads" placeholder="Ex: 45"/></div>
+          <div><label class="form-label" style="font-size:9.5px">Compras</label><input id="m-purchases" placeholder="Ex: 12"/></div>
+          <div><label class="form-label" style="font-size:9.5px">CPA/CPL (R$)</label><input id="m-cpa" placeholder="Ex: 89"/></div>
+        </div>
+      </div>
+
+      <div><label class="form-label">Contexto adicional (opcional)</label>
+        <textarea id="camp-context" rows="3"
+          placeholder="Ex: Campanha rodando há 15 dias, público broad 25-45, objetivo conversão, pixel + CAPI configurado..."></textarea></div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="runCamp()" id="btn-camp" style="padding:11px 24px">📊 Diagnosticar</button>
+        <button class="btn btn-ghost" onclick="clearCamp()">Limpar</button>
+      </div>
+    </div>
+
+    <div id="camp-loading" class="loading hidden" style="margin-top:16px">Comparando com benchmarks do Brain...</div>
+    <div id="camp-result" class="hidden fade" style="margin-top:18px">
+      <div class="ai-result-box" style="border-left-color:var(--acc)" id="camp-result-text"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="copyText('camp-result-text')">Copiar</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveResultAsNote('camp')">Salvar no Brain</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ─────────────────────────── STORAGE ─────────────────────────────────────
+const LS = "brain-v3";
+function load() { try { return JSON.parse(localStorage.getItem(LS)||"[]"); } catch { return []; } }
+function save(n) { localStorage.setItem(LS, JSON.stringify(n)); }
+
+// ─────────────────────────── SEED DATA ───────────────────────────────────
+const SEED = [
+  { id:"arena-perfil", title:"Arena Publicidade — Perfil Completo", client:"Arena Publicidade", category:"Clientes", tags:["B2B","LinkedIn","corporativo"],
+    content:"## Posicionamento\nAgência B2B de marketing promocional. Problema central: percebida como commodity, não como parceira estratégica.\n\n## Tom de Voz\nProfissional, consultivo, ROI-focado. Tom de parceiro, não vendedor. Evitar: linguagem de varejo, imagens de brindes baratos.\n\n## Público-Alvo\nGestores de marketing, compradores B2B, diretores em empresas 200+ funcionários. Decisores corporativos.\n\n## Plataformas Ativas\nLinkedIn Ads (principal), Meta Ads, Google Ads\n\n## KPIs Prioritários\nCPL < R$150, taxa MQL→reunião > 20%, ciclo de vendas < 45 dias\n\n## Objeções e Respostas\n- 'Só preciso de brindes simples' → posicionar como estratégia de retenção/fidelização\n- 'Posso comprar direto' → destacar consultoria, execução e resultado mensurável\n\n## Sazonalidade B2B\nPicos: jan/fev (início ano corporativo) e set/out (Q4). Baixa: dez (festas) e jul (férias)." },
+  { id:"novabeach-perfil", title:"Nova Beach Campinas — Perfil Completo", client:"Nova Beach", category:"Clientes", tags:["local","beach tennis","leads","funcional"],
+    content:"## Posicionamento\nAcademia de beach tennis e funcional na areia em Campinas/SP. Experiência premium, comunidade ativa.\n\n## Tom de Voz\nEnergético, motivacional, lifestyle ativo. Comunidade e evolução. Evitar: tom de academia convencional.\n\n## Público-Alvo\nAdultos 25-45 anos, ativos, classes A/B, Campinas e região. Interesses: esporte, saúde, outdoor.\n\n## Plataformas\nMeta Ads (principal), Instagram orgânico\n\n## Budget Referência\nR$1.000 - R$3.000/mês\n\n## KPIs\nCPL < R$40, conversão experimental→matrícula > 30%, frequência de treino ativa\n\n## Sazonalidade\nAlta: outubro-março (verão). Baixa: abril-setembro.\n\n## Modalidades\nBeach Tennis (principal) + Treino Funcional na Areia (secundário)" },
+  { id:"benchmarks-meta", title:"Benchmarks Meta Ads Brasil 2024", client:"Geral", category:"Benchmarks", tags:["CTR","CPC","CPM","ROAS","frequência"],
+    content:"## E-commerce\n- CTR Feed: 1.0% - 2.5%\n- CPC: R$0,80 - R$2,50\n- CPM: R$18 - R$45\n- ROAS mínimo: 2.5x\n- Frequência ideal: 2.0 - 3.5\n\n## Serviços Locais\n- CTR: 1.5% - 3.5%\n- CPL: R$15 - R$60\n- CPM: R$20 - R$55\n\n## B2B Lead Gen\n- CTR: 0.5% - 1.5%\n- CPL: R$50 - R$250\n- Taxa qualificação: 20-40%\n\n## Sinais de Saturação\n- Frequência > 4.5 → trocar criativos urgente\n- CTR caindo >30% em 7 dias → público saturado\n- CPM subindo >40% → qualidade baixa\n\n## Regra de Ouro\nNunca pausar com <3 dias e <1.000 impressões. Mínimo 50 eventos/semana para otimizar." },
+  { id:"copy-framework", title:"Framework de Copy — Tráfego Pago BR", client:"Geral", category:"Frameworks", tags:["copy","hook","CTA"],
+    content:"## Estrutura Texto Primário\n1. Hook: dor, curiosidade ou dado\n2. Problema amplificado\n3. Solução\n4. Prova social\n5. CTA específico\n\n## Hooks que Convertem\n- 'Você sabia que [dado]?'\n- '[X]% dos [público] cometem esse erro...'\n- 'Para de [negativo] e começa a...'\n- 'O motivo pelo qual seu [resultado] não melhora é...'\n\n## CTAs por Objetivo\n- Lead: 'Quero saber mais' / 'Receber proposta grátis'\n- Agendamento: 'Agendar aula experimental'\n- Venda: 'Aproveitar oferta'\n\n## Tamanhos Ideais\n- Texto primário mobile: 125 chars\n- Headline: 40 chars\n- Descrição: 30 chars" },
+  { id:"diagnostico-framework", title:"Framework de Diagnóstico — 9 Camadas", client:"Geral", category:"Frameworks", tags:["diagnóstico","gargalo","growth","otimização"],
+    content:"## As 9 Camadas de Análise\n1. Estratégia\n2. Oferta\n3. Posicionamento\n4. Público\n5. Criativo\n6. Funil\n7. UX\n8. Dados\n9. Infraestrutura técnica\n\n## Gargalos por Sintoma\n- CTR <0.8% → criativo ou segmentação\n- CTR alto + conversão baixa → LP ou oferta\n- CPM alto → qualidade baixa\n- Freq >4 → audiência saturada\n- ROAS caindo → saturação + delay de atribuição\n\n## Classificações\n- SAUDÁVEL: métricas dentro dos benchmarks, sem sinais de saturação\n- ALERTA: 1-2 camadas com problema, ainda escalável com ajustes\n- CRÍTICO: gargalo estrutural, não escalar antes de corrigir\n\n## Regra de Ouro\nSempre identificar o gargalo ANTES de sugerir solução. Nunca aumentar tráfego se o problema for conversão." },
+];
+
+// ─────────────────────────── STATE ───────────────────────────────────────
+let notes = load();
+let currentNote = null;
+let aiMode = "consult";
+let filterCat = "Tudo";
+const CATS = ["Tudo","Clientes","Benchmarks","Estratégias","Frameworks","Campanhas","Criativos","Notas"];
+const CCOL = { "Arena Publicidade":"#d4956a","Nova Beach":"#5bad85","Geral":"#9b7dbf" };
+
+if (!notes.length) { notes = JSON.parse(JSON.stringify(SEED)); save(notes); }
+
+// ─────────────────────────── SYSTEM PROMPTS ──────────────────────────────
+const GROWTH_SYSTEM = `Você é um Head de Growth Sênior responsável por otimizar, corrigir e escalar sistemas de marketing digital já existentes. Você NÃO cria sistemas do zero. Sua função é diagnosticar gargalos, identificar falhas ocultas, melhorar eficiência, aumentar conversão e preparar o sistema para escala previsível.
+
+REGRAS OBRIGATÓRIAS:
+- Sempre encontrar o GARGALO PRINCIPAL antes de sugerir qualquer solução
+- Sempre pensar em ROI e impacto financeiro
+- NUNCA sugerir aumentar tráfego se o problema for conversão
+- NUNCA sugerir escalar se o sistema não estiver validado
+- Ser direto, estratégico e prático — zero dicas genéricas
+
+ANÁLISE OBRIGATÓRIA — 9 CAMADAS:
+Sempre avalie: 1.Estratégia 2.Oferta 3.Posicionamento 4.Público 5.Criativo 6.Funil 7.UX 8.Dados 9.Infraestrutura técnica
+
+SAÍDA OBRIGATÓRIA:
+1. GARGALO PRINCIPAL — onde está perdendo dinheiro / travando crescimento
+2. CLASSIFICAÇÃO: Saudável 🟢 | Alerta 🟡 | Crítico 🔴
+3. TIPO DE PROBLEMA: Estratégia fraca / Criativo saturado / Público mal posicionado / UX fraca / Funil ineficiente / Tracking inconsistente / Escala prematura
+4. FALHAS MAPEADAS por área: Aquisição / Conversão / Retenção / Criativos / Dados
+5. OTIMIZAÇÕES: Quick wins (impacto rápido) | Melhorias estruturais | Ações de escala
+6. TESTES PRÁTICOS: hipótese + o que alterar + métrica de sucesso
+7. PLANO 7 DIAS: o que fazer cada dia, o que medir, o que ajustar`;
+
+const MODES = {
+  consult: `Você é um especialista em marketing digital brasileiro com acesso à base de conhecimento abaixo. Responda usando esse contexto como referência principal. Seja direto e estratégico.`,
+  strategy: `Você é um estrategista de marketing digital. Use os perfis de clientes e frameworks da base de conhecimento para criar a estratégia solicitada com etapas práticas e KPIs definidos.`,
+  copy: `Você é um copywriter especialista em tráfego pago no Brasil. Use os perfis e frameworks da base de conhecimento para criar copies prontos para veicular, com hook, corpo e CTA. Entregue variações.`,
+  growth: GROWTH_SYSTEM,
+};
+
+// ─────────────────────────── API ─────────────────────────────────────────
+async function callAI(system, user, maxTokens = 1200) {
+  const r = await fetch("/api/claude", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ system, user, max_tokens: maxTokens })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(typeof d.error === "string" ? d.error : d.error.message || JSON.stringify(d.error));
+  return d.text;
+}
+
+function buildContext(client) {
+  const relevant = notes.filter(n => !client || n.client === client || n.client === "Geral");
+  return relevant.map(n => `### ${n.title}\n${n.content}`).join("\n\n---\n\n");
+}
+
+// ─────────────────────────── TABS ────────────────────────────────────────
+function showTab(t) {
+  ["base","note","edit","ai","audit","campaign"].forEach(id => {
+    const el = document.getElementById(`tab-${id}`);
+    if (el) el.classList.toggle("hidden", id !== t);
+  });
+  document.querySelectorAll(".tab").forEach((el, i) => {
+    el.classList.toggle("active", ["base","ai","audit","campaign"][i] === t);
+  });
+  if (t === "base") { renderAll(); }
+  if (t === "ai") { updateContextInfo(); }
+}
+
+// ─────────────────────────── RENDER BASE ─────────────────────────────────
+function renderAll() { renderStats(); renderCatPills(); renderNotes(); }
+
+function renderStats() {
+  document.getElementById("stats-row").innerHTML = [
+    ["Notas", notes.length, "#d4956a"],
+    ["Clientes", [...new Set(notes.map(n=>n.client))].length, "#6a8eb5"],
+    ["Categorias", [...new Set(notes.map(n=>n.category))].length, "#9b7dbf"],
+  ].map(([l,v,c])=>`<div class="stat-card"><div class="stat-lbl">${l}</div><div class="stat-val" style="color:${c}">${v}</div></div>`).join("");
+}
+
+function renderCatPills() {
+  document.getElementById("cat-pills").innerHTML = CATS.map(c =>
+    `<button class="pill ${filterCat===c?"active":""}" onclick="setCat('${c}')">${c}</button>`
+  ).join("");
+}
+
+function setCat(c) { filterCat = c; renderCatPills(); renderNotes(); }
+
+function renderNotes() {
+  const q = (document.getElementById("search-q").value||"").toLowerCase();
+  const fc = document.getElementById("filter-client").value;
+  const filtered = notes.filter(n => {
+    const mCat = filterCat === "Tudo" || n.category === filterCat;
+    const mClient = fc === "Todos" || n.client === fc;
+    const mQ = !q || n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q) || (n.tags||[]).some(t=>t.toLowerCase().includes(q));
+    return mCat && mClient && mQ;
+  });
+  if (!filtered.length) {
+    document.getElementById("notes-grid").innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="ico">◈</div><div>Nenhuma nota encontrada.</div></div>`;
+    return;
+  }
+  document.getElementById("notes-grid").innerHTML = filtered.map(n => `
+    <div class="note-card fade" onclick="openNote('${n.id}')" style="border-left-color:${CCOL[n.client]||"#555"}">
+      <div class="note-meta">${n.category} · ${n.client}</div>
+      <div class="note-title">${n.title}</div>
+      <div class="note-preview">${n.content.replace(/#+\s/g,"").replace(/\*\*/g,"").replace(/\[.\]\s/g,"").slice(0,120)}</div>
+      ${(n.tags||[]).length?`<div class="note-tags">${n.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>`:""}
+    </div>`).join("");
+}
+
+// ─────────────────────────── NOTE CRUD ───────────────────────────────────
+function openNote(id) {
+  currentNote = notes.find(n => n.id === id);
+  if (!currentNote) return;
+  const col = CCOL[currentNote.client]||"#555";
+  document.getElementById("note-badges").innerHTML =
+    `<span style="font-size:10px;font-family:monospace;padding:3px 9px;background:${col}18;color:${col};border-radius:20px">${currentNote.category}</span>
+     <span style="font-size:10px;font-family:monospace;padding:3px 9px;background:#1a1a1a;color:#555;border-radius:20px">${currentNote.client}</span>
+     ${(currentNote.tags||[]).map(t=>`<span style="font-size:10px;font-family:monospace;color:#555"># ${t}</span>`).join("")}`;
+  document.getElementById("note-title").textContent = currentNote.title;
+  document.getElementById("note-body").textContent = currentNote.content;
+  showTabRaw("note");
+}
+function showTabRaw(t) {
+  ["base","note","edit","ai","audit","campaign"].forEach(id => {
+    const el = document.getElementById(`tab-${id}`);
+    if (el) el.classList.toggle("hidden", id !== t);
+  });
+}
+function openEdit() {
+  const n = currentNote;
+  document.getElementById("edit-title").value = n.title;
+  document.getElementById("edit-client").value = n.client;
+  document.getElementById("edit-category").value = n.category;
+  document.getElementById("edit-tags").value = (n.tags||[]).join(", ");
+  document.getElementById("edit-content").value = n.content;
+  showTabRaw("edit");
+}
+function openNew() {
+  currentNote = null;
+  ["edit-title","edit-tags","edit-content"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("edit-client").value = "Geral";
+  document.getElementById("edit-category").value = "Notas";
+  showTabRaw("edit");
+}
+function cancelEdit() { currentNote ? openNote(currentNote.id) : showTab("base"); }
+function saveCurrentNote() {
+  const title = document.getElementById("edit-title").value.trim();
+  const content = document.getElementById("edit-content").value.trim();
+  if (!title || !content) { alert("Preencha título e conteúdo."); return; }
+  const btn = document.getElementById("btn-save");
+  btn.textContent = "Salvando..."; btn.disabled = true;
+  const n = currentNote || { id:`note-${Date.now()}` };
+  n.title = title;
+  n.client = document.getElementById("edit-client").value;
+  n.category = document.getElementById("edit-category").value;
+  n.tags = document.getElementById("edit-tags").value.split(",").map(t=>t.trim()).filter(Boolean);
+  n.content = content;
+  n.upd = Date.now();
+  notes = [n, ...notes.filter(x => x.id !== n.id)];
+  save(notes);
+  currentNote = n;
+  btn.textContent = "✓ Salvar"; btn.disabled = false;
+  openNote(n.id);
+}
+function deleteCurrentNote() {
+  if (!currentNote || !confirm("Remover esta nota?")) return;
+  notes = notes.filter(n => n.id !== currentNote.id);
+  save(notes); currentNote = null; showTab("base");
+}
+
+// ─────────────────────────── AI CONSULT ──────────────────────────────────
+function setMode(m) {
+  aiMode = m;
+  document.querySelectorAll(".mode-pill").forEach(el => {
+    el.classList.remove("active","growth-active");
+  });
+  const el = document.getElementById(`mode-${m}`);
+  if (el) el.classList.add(m==="growth"?"growth-active":"active");
+  const badges = { consult:"💬 Consultar", strategy:"🎯 Estratégia", copy:"✍ Copy", growth:"🔬 Head de Growth" };
+  const mb = document.getElementById("mode-badge");
+  if (mb) { mb.textContent = badges[m]||m; mb.style.color = m==="growth"?"#5bad85":"#d4956a"; }
+  const placeholders = {
+    consult: "Ex: Qual o tom de voz ideal para a Arena Publicidade em LinkedIn Ads?",
+    strategy: "Ex: Crie uma estratégia de lançamento de campanha de leads para a Arena no LinkedIn, com funil completo.",
+    copy: "Ex: Crie 3 variações de anúncio para captar leads B2B para a Arena Publicidade no Meta Ads.",
+    growth: "Ex: Meu CTR está em 0.6%, frequência em 5.2 e CPL subiu 40% nas últimas 2 semanas. O que está errado e o que fazer?"
+  };
+  const ta = document.getElementById("ai-query");
+  if (ta) ta.placeholder = placeholders[m]||"";
+}
+
+function updateContextInfo() {
+  const n = notes.length;
+  const el = document.getElementById("ai-ctx-count");
+  if (el) el.textContent = `A IA lê todas as ${n} notas do Brain antes de responder — benchmarks, perfis de clientes e frameworks incluídos.`;
+  const cl = document.getElementById("ctx-list");
+  if (cl) cl.innerHTML = `<strong style="color:var(--dim2)">Notas no contexto:</strong> ${notes.map(n=>n.title).join(" · ")}`;
+}
+
+function sendNoteToAI() {
+  if (!currentNote) return;
+  document.getElementById("ai-query").value = `Com base na nota "${currentNote.title}", me dê insights estratégicos e ações práticas imediatas.`;
+  setMode("consult");
+  showTab("ai");
+}
+
+async function runAI() {
+  const q = document.getElementById("ai-query").value.trim();
+  if (!q) return;
+  const btn = document.getElementById("btn-ai");
+  btn.disabled = true; btn.textContent = "⏳ Consultando...";
+  document.getElementById("ai-loading").classList.remove("hidden");
+  document.getElementById("ai-result").classList.add("hidden");
+
+  const ctx = buildContext();
+  const sys = MODES[aiMode] + `\n\nBASE DE CONHECIMENTO DO BRAIN:\n${ctx}`;
+  const maxTk = aiMode === "growth" ? 1500 : 1000;
+  try {
+    const text = await callAI(sys, q, maxTk);
+    document.getElementById("ai-result-text").textContent = text;
+    document.getElementById("ai-result").classList.remove("hidden");
+  } catch(e) {
+    document.getElementById("ai-result-text").textContent = `Erro: ${e.message}`;
+    document.getElementById("ai-result").classList.remove("hidden");
+  }
+  document.getElementById("ai-loading").classList.add("hidden");
+  btn.disabled = false; btn.textContent = "⚡ Consultar Brain";
+}
+function clearAI() {
+  document.getElementById("ai-query").value = "";
+  document.getElementById("ai-result").classList.add("hidden");
+}
+
+// ─────────────────────────── GROWTH AUDIT ────────────────────────────────
+async function runAudit() {
+  const btn = document.getElementById("btn-audit");
+  btn.disabled = true; btn.textContent = "⏳ Auditando...";
+  document.getElementById("audit-loading").classList.remove("hidden");
+  document.getElementById("audit-result").classList.add("hidden");
+
+  const client = document.getElementById("audit-client").value;
+  const ctx = buildContext(client);
+
+  const fields = {
+    "Cliente": client,
+    "Objetivo": document.getElementById("audit-obj").value,
+    "Oferta principal": document.getElementById("a-oferta").value,
+    "Diferencial comunicado": document.getElementById("a-diferencial").value,
+    "Público nas campanhas": document.getElementById("a-publico").value,
+    "Problema de posicionamento": document.getElementById("a-posicionamento").value,
+    "Formatos de criativo em uso": document.getElementById("a-formatos").value,
+    "Última troca de criativo": document.getElementById("a-criativo-data").value,
+    "Destino pós-clique": document.getElementById("a-destino").value,
+    "Taxa de conversão atual": document.getElementById("a-conv").value,
+    "Tracking configurado": document.getElementById("a-tracking").value,
+    "Evento otimizando": document.getElementById("a-evento").value,
+    "Gasto mensal": document.getElementById("a-spend").value ? `R$${document.getElementById("a-spend").value}` : "",
+    "CTR": document.getElementById("a-ctr").value ? `${document.getElementById("a-ctr").value}%` : "",
+    "CPL/CPA": document.getElementById("a-cpl").value ? `R$${document.getElementById("a-cpl").value}` : "",
+    "ROAS": document.getElementById("a-roas").value,
+    "Frequência": document.getElementById("a-freq").value,
+    "CPM": document.getElementById("a-cpm").value ? `R$${document.getElementById("a-cpm").value}` : "",
+    "Contexto adicional": document.getElementById("a-contexto").value,
+  };
+
+  const filledFields = Object.entries(fields).filter(([,v])=>v).map(([k,v])=>`**${k}:** ${v}`).join("\n");
+  const sys = GROWTH_SYSTEM + `\n\nCONTEXTO DO BRAIN (perfis, benchmarks e frameworks):\n${ctx}`;
+  const usr = `Execute um Growth Audit completo nas 9 camadas para este sistema:\n\n${filledFields}`;
+
+  try {
+    const text = await callAI(sys, usr, 1800);
+    document.getElementById("audit-result-text").textContent = text;
+
+    // Status badge heuristic
+    const lower = text.toLowerCase();
+    const badge = document.getElementById("audit-status-badge");
+    if (lower.includes("crítico") || lower.includes("🔴")) { badge.className="badge badge-crit"; badge.textContent="🔴 CRÍTICO"; }
+    else if (lower.includes("alerta") || lower.includes("🟡")) { badge.className="badge badge-warn"; badge.textContent="🟡 ALERTA"; }
+    else { badge.className="badge badge-ok"; badge.textContent="🟢 SAUDÁVEL"; }
+
+    document.getElementById("audit-client-badge").textContent = `${client} · ${new Date().toLocaleDateString("pt-BR")}`;
+    document.getElementById("audit-result").classList.remove("hidden");
+  } catch(e) {
+    document.getElementById("audit-result-text").textContent = `Erro: ${e.message}`;
+    document.getElementById("audit-result").classList.remove("hidden");
+  }
+  document.getElementById("audit-loading").classList.add("hidden");
+  btn.disabled = false; btn.textContent = "🔬 Executar Growth Audit";
+}
+function clearAudit() {
+  ["a-oferta","a-diferencial","a-publico","a-posicionamento","a-formatos","a-criativo-data",
+   "a-destino","a-conv","a-tracking","a-evento","a-spend","a-ctr","a-cpl","a-roas","a-freq","a-cpm","a-contexto"]
+    .forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+  document.getElementById("audit-result").classList.add("hidden");
+}
+
+// ─────────────────────────── CAMPAIGN ────────────────────────────────────
+async function runCamp() {
+  const btn = document.getElementById("btn-camp");
+  btn.disabled = true; btn.textContent = "⏳ Analisando...";
+  document.getElementById("camp-loading").classList.remove("hidden");
+  document.getElementById("camp-result").classList.add("hidden");
+
+  const client = document.getElementById("camp-client").value;
+  const name = document.getElementById("camp-name").value || "Campanha sem nome";
+  const ctx = buildContext(client);
+
+  const metrics = [
+    ["Gasto","m-spend","R$"],["CTR","m-ctr","%"],["CPC","m-cpc","R$"],
+    ["CPM","m-cpm","R$"],["ROAS","m-roas",""],["Frequência","m-freq",""],
+    ["Leads","m-leads",""],["Compras","m-purchases",""],["CPA/CPL","m-cpa","R$"]
+  ].filter(([,id]) => document.getElementById(id).value)
+   .map(([l,id,u]) => `${l}: ${u}${document.getElementById(id).value}`).join(" | ");
+
+  const extra = document.getElementById("camp-context").value;
+  const sys = GROWTH_SYSTEM + `\n\nBENCHMARKS E PERFIS DO BRAIN:\n${ctx}`;
+  const usr = `Analise esta campanha:\n\nCLIENTE: ${client}\nCAMPANHA: ${name}\nMÉTRICAS: ${metrics||"Não informadas"}\n${extra?`\nCONTEXTO ADICIONAL: ${extra}`:""}\n\nDiagnostique nas 9 camadas, classifique o status e sugira ações imediatas (próximas 48h).`;
+
+  try {
+    const text = await callAI(sys, usr, 1200);
+    document.getElementById("camp-result-text").textContent = text;
+    document.getElementById("camp-result").classList.remove("hidden");
+  } catch(e) {
+    document.getElementById("camp-result-text").textContent = `Erro: ${e.message}`;
+    document.getElementById("camp-result").classList.remove("hidden");
+  }
+  document.getElementById("camp-loading").classList.add("hidden");
+  btn.disabled = false; btn.textContent = "📊 Diagnosticar";
+}
+function clearCamp() {
+  ["camp-name","camp-context","m-spend","m-ctr","m-cpc","m-cpm","m-roas","m-freq","m-leads","m-purchases","m-cpa"]
+    .forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+  document.getElementById("camp-result").classList.add("hidden");
+}
+
+// ─────────────────────────── UTILS ───────────────────────────────────────
+function copyText(id) {
+  const t = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(t).then(()=>alert("Copiado!")).catch(()=>{});
+}
+
+function saveResultAsNote(source) {
+  const ids = { ai:"ai-result-text", audit:"audit-result-text", camp:"camp-result-text" };
+  const text = document.getElementById(ids[source])?.textContent || "";
+  const titles = { ai:`Resposta IA — ${new Date().toLocaleDateString("pt-BR")}`, audit:`Growth Audit — ${new Date().toLocaleDateString("pt-BR")}`, camp:`Diagnóstico Campanha — ${new Date().toLocaleDateString("pt-BR")}` };
+  const cats = { ai:"Notas", audit:"Campanhas", camp:"Campanhas" };
+  const n = { id:`saved-${Date.now()}`, title:titles[source], client:"Geral", category:cats[source], tags:["ia","brain","diagnóstico"], content:text, upd:Date.now() };
+  notes = [n, ...notes];
+  save(notes);
+  alert("Salvo no Brain!");
+}
+
+// ─────────────────────────── INIT ────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>

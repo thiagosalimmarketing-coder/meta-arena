@@ -1,0 +1,9 @@
+{
+  "name": "vortex-intelligence",
+  "version": "1.0.0",
+  "description": "VÓRTEX — Intelligence Platform by Thiago Saldini",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}

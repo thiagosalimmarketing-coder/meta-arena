@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VÓRTEX — Intelligence Platform</title>
+<style>
+  :root {
+    --bg: #090909; --surf: #0f0f0f; --brd: #1c1c1c;
+    --txt: #ebe7e1; --dim: #555; --acc: #d4956a;
+    --green: #5bad85; --red: #e07070; --blue: #6a8eb5; --purple: #9b7dbf;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--txt); font-family: Georgia, serif; font-size: 14px; }
+  input, select { background: var(--surf); border: 1px solid var(--brd); color: var(--txt);
+    padding: 8px 12px; border-radius: 6px; font-size: 12px; outline: none; font-family: monospace; }
+  input:focus, select:focus { border-color: var(--acc); }
+  button { cursor: pointer; font-family: Georgia, serif; font-weight: 600; border: none;
+    border-radius: 6px; transition: opacity .15s; }
+  button:hover:not(:disabled) { opacity: .8; }
+  button:disabled { cursor: not-allowed; opacity: .4; }
+  ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+  select option { background: #111; }
+
+  /* LAYOUT */
+  #header { border-bottom: 1px solid var(--brd); padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  #header-left .sub { font-size: 10px; letter-spacing: .35em; color: #2e2e2e; margin-bottom: 2px; text-transform: uppercase; }
+  #header-left .title { font-size: 18px; font-weight: 400; }
+  #header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  #main { max-width: 980px; margin: 0 auto; padding: 24px 20px; }
+
+  /* CARDS */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .grid-sm { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .mcard { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; }
+  .mcard .lbl { font-size: 10px; letter-spacing: .18em; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
+  .mcard .val { font-size: 20px; font-weight: 600; font-family: monospace; }
+  .mcard .sub { font-size: 11px; color: #444; margin-top: 3px; }
+  .kv { padding: 8px 12px; background: var(--surf); border: 1px solid var(--brd); border-radius: 6px;
+    display: flex; justify-content: space-between; align-items: center; }
+  .kv .k { font-size: 11.5px; color: var(--dim); }
+  .kv .v { font-size: 11.5px; font-family: monospace; }
+
+  /* SECTION */
+  .section-head { display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--brd); cursor: pointer; user-select: none; margin-bottom: 14px; }
+  .section-head span { font-size: 11px; letter-spacing: .2em; color: #888; text-transform: uppercase; }
+  .section-head .arrow { color: #333; font-size: 12px; }
+
+  /* BADGE */
+  .badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-family: monospace; white-space: nowrap; }
+  .badge-ACTIVE   { background:#5bad8520; border:1px solid #5bad8540; color:#5bad85; }
+  .badge-PAUSED   { background:#d4956a20; border:1px solid #d4956a40; color:#d4956a; }
+  .badge-ARCHIVED { background:#55555520; border:1px solid #55555540; color:#555; }
+
+  /* CAMPAIGN CARD */
+  .camp-card { margin-bottom: 10px; background: var(--surf); border: 1px solid var(--brd);
+    border-radius: 8px; padding: 14px 16px; }
+  .camp-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .camp-name { font-size: 13.5px; color: var(--txt); margin-bottom: 4px; line-height: 1.3; }
+  .camp-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .camp-spend { font-size: 16px; color: var(--acc); font-family: monospace; font-weight: 600; flex-shrink: 0; }
+  .mini-grid { display: flex; gap: 6px; flex-wrap: wrap; }
+  .mini-cell { padding: 4px 8px; background: #0d0d0d; border: 1px solid #181818; border-radius: 4px; }
+  .mini-cell .mk { font-size: 9.5px; color: #3a3a3a; }
+  .mini-cell .mv { font-size: 12px; font-family: monospace; }
+
+  /* AD CARD */
+  .ad-card { margin-bottom: 8px; background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 12px 14px; }
+  .ad-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--brd); flex-shrink: 0; }
+  .ad-row { display: flex; gap: 12px; }
+  .cta-tag { margin-top: 4px; display: inline-block; font-size: 10px; padding: 2px 7px;
+    background: #6a9e8e20; border: 1px solid #6a9e8e40; border-radius: 3px; color: #6a9e8e; font-family: monospace; }
+
+  /* AUDIENCE */
+  .aud-row { margin-bottom: 6px; padding: 10px 14px; background: var(--surf); border: 1px solid var(--brd);
+    border-radius: 7px; display: flex; justify-content: space-between; align-items: center; }
+
+  /* PIXEL */
+  .pixel-row { padding: 12px 14px; background: var(--surf); border: 1px solid var(--brd);
+    border-radius: 8px; display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
+
+  /* ERROR */
+  .error-box { padding: 14px 16px; background: #130707; border: 1px solid #3a1010;
+    border-radius: 8px; color: var(--red); font-size: 13px; margin-bottom: 20px; }
+  .error-box small { display: block; margin-top: 6px; font-size: 11px; color: #854040; }
+
+  /* LOADING */
+  #loading { text-align: center; padding: 60px 20px; color: var(--dim); }
+  #loading .icon { font-size: 28px; margin-bottom: 12px; animation: pulse 1.5s infinite; }
+
+  /* PROGRESS BAR */
+  #progress-wrap { background: #0f0f0f; border: 1px solid #1c1c1c; border-radius: 7px; padding: 14px 16px; margin-bottom: 20px; }
+  #progress-bar-track { height: 2px; background: #1c1c1c; border-radius: 1px; margin-top: 8px; }
+  #progress-bar { height: 100%; border-radius: 1px; background: linear-gradient(90deg, var(--acc), var(--purple)); width: 0%; transition: width .5s ease; }
+  #progress-label { font-size: 11px; font-family: monospace; color: var(--dim); }
+
+  /* CONFIG */
+  #config { margin-top: 24px; border: 1px solid var(--brd); border-radius: 8px; overflow: hidden; }
+  #config summary { padding: 10px 14px; cursor: pointer; font-size: 11px; color: #2a2a2a;
+    font-family: monospace; user-select: none; list-style: none; }
+  #config-body { padding: 14px; border-top: 1px solid var(--brd); display: flex; flex-direction: column; gap: 10px; }
+  .config-field label { display: block; font-size: 10px; color: var(--dim); letter-spacing: .15em;
+    text-transform: uppercase; margin-bottom: 4px; }
+  .config-field input { width: 100%; }
+
+  /* TOP PERFORMERS */
+  .top-bar { background: #0d0d0d; border-radius: 4px; overflow: hidden; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; padding: 6px 8px; }
+  .top-fill { height: 4px; border-radius: 2px; background: var(--acc); }
+
+  /* SCORES OCULTOS */
+  .score-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; margin-bottom: 20px; }
+  .score-card { background: var(--surf); border: 1px solid var(--brd); border-radius: 8px; padding: 14px 16px; }
+  .score-card .sc-lbl { font-size: 10px; letter-spacing: .15em; color: var(--dim); text-transform: uppercase; margin-bottom: 8px; }
+  .score-card .sc-val { font-size: 13px; font-weight: 600; font-family: monospace; margin-bottom: 6px; }
+  .score-card .sc-bar-track { height: 5px; background: #1a1a1a; border-radius: 3px; overflow: hidden; }
+  .score-card .sc-bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+  .score-card .sc-desc { font-size: 11px; color: var(--dim); margin-top: 6px; line-height: 1.45; }
+  .score-section { background: #0a0a0a; border: 1px solid #1c1c1c; border-radius: 10px; padding: 18px; margin-bottom: 24px; }
+  .score-section .sc-header { font-size: 10px; letter-spacing: .25em; color: #444; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .score-section .sc-header span { color: var(--acc); font-size: 14px; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  .fade { animation: fadeIn .35s ease; }
+
+  .hidden { display: none !important; }
+  .tag { font-size: 10px; padding: 1px 6px; background: #161616; border: 1px solid #1e1e1e; border-radius: 3px; color: #555; }
+  .section-body { margin-bottom: 24px; }
+  .dots { display: flex; gap: 4px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brd); transition: all .3s; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="header-left">
+    <div class="sub">VÓRTEX · INTELLIGENCE PLATFORM</div>
+    <div class="title" id="acct-name">VÓRTEX</div>
+  </div>
+  <div id="header-right">
+    <div class="dots" id="dot-row"></div>
+    <select id="date-preset">
+      <option value="today">Hoje</option>
+      <option value="yesterday">Ontem</option>
+      <option value="last_7d">Últimos 7 dias</option>
+      <option value="last_14d">Últimos 14 dias</option>
+      <option value="last_30d" selected>Últimos 30 dias</option>
+      <option value="this_month">Este mês</option>
+      <option value="last_month">Mês passado</option>
+    </select>
+    <a href="/demographics.html" style="padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-family:monospace;cursor:pointer;background:#9b7dbf15;color:#9b7dbf;text-decoration:none;display:inline-flex;align-items:center;">📊 Demográficos</a>
+    <a href="/tracker.html" style="padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-family:monospace;cursor:pointer;background:#6a8eb515;color:#6a8eb5;text-decoration:none;display:inline-flex;align-items:center;">🔬 Tracking</a>
+    <a href="/brain.html" class="nav-link" style="padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-family:monospace;cursor:pointer;background:#5bad8515;border:1px solid #5bad8530;color:#5bad85;text-decoration:none;display:inline-flex;align-items:center;">◈ Brain</a>
+    <a href="/carrossel.html" class="nav-link" style="padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-family:monospace;cursor:pointer;background:#9b7dbf15;border:1px solid #9b7dbf30;color:#9b7dbf;text-decoration:none;display:inline-flex;align-items:center;">🎠 Carrossel</a>
+    <a href="/squads.html" class="nav-link" style="padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-family:monospace;cursor:pointer;background:#e0707015;border:1px solid #e0707030;color:#e07070;text-decoration:none;display:inline-flex;align-items:center;">⚡ Squads</a>
+    <a href="/utm.html" class="nav-link" style="padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-family:monospace;cursor:pointer;background:#d4956a15;border:1px solid #d4956a30;color:#d4956a;text-decoration:none;display:inline-flex;align-items:center;">📎 UTM</a>
+    <a href="/protector.html" class="nav-link" style="padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-family:monospace;cursor:pointer;background:#e0707015;color:#e07070;text-decoration:none;display:inline-flex;align-items:center;">🛡 Budget Protector</a>
+    <button id="btn-refresh" onclick="fetchAll()" style="padding:8px 16px;background:var(--acc);color:#080808;font-size:12px;">↻ Atualizar</button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="error-wrap" class="hidden"></div>
+  <div id="loading">
+    <div class="icon">⬡</div>
+    <div style="font-size:13px;font-family:monospace;">Conectando à Meta Graph API...</div>
+    <div style="font-size:11px;color:#333;margin-top:4px;" id="loading-sub">Buscando campanhas, adsets, anúncios, públicos e pixel</div>
+  </div>
+  <div id="progress-wrap" class="hidden">
+    <div id="progress-label">Carregando...</div>
+    <div id="progress-bar-track"><div id="progress-bar"></div></div>
+  </div>
+  <div id="content" class="hidden fade"></div>
+  <details id="config">
+    <summary>⚙ Configurar token / conta</summary>
+    <div id="config-body">
+      <div class="config-field"><label>Access Token</label><input id="cfg-token" placeholder="EAAK..." /></div>
+      <div class="config-field"><label>Ad Account ID</label><input id="cfg-act" placeholder="act_..." /></div>
+      <button onclick="applyConfig()" style="padding:8px 16px;background:var(--acc);color:#080808;font-size:12px;align-self:flex-start;">Conectar</button>
+    </div>
+  </details>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────
+const DEFAULT_TOKEN = "EAAK0fWGyBnYBRG3xqqnYOPMKLZAakYeAR763z0fUlz63MZCRGYmtLhDZCcWZCxNJbcZAWKLl289LbuAqwiorLzFqhQo00qg9bZCZC4FO9so0ZBbLCSRGowY42GBcHMPg8WLKjacVrML9PpZA9ZAZB8N0lhwqrzSWK5rk1NUATFuGPG3WFWWJBfVNU6s81Lgh9cPgZDZD";
+const DEFAULT_ACT   = "act_604987865349440";
+const INSIGHT_FIELDS = "impressions,clicks,spend,reach,ctr,cpc,cpm,actions,cost_per_action_type,frequency,quality_ranking,engagement_rate_ranking,conversion_rate_ranking";
+
+let TOKEN = localStorage.getItem("meta_token") || DEFAULT_TOKEN;
+let ACT   = localStorage.getItem("meta_act")   || DEFAULT_ACT;
+document.getElementById("cfg-token").value = TOKEN;
+document.getElementById("cfg-act").value   = ACT;
+
+function applyConfig() {
+  TOKEN = document.getElementById("cfg-token").value.trim();
+  ACT   = document.getElementById("cfg-act").value.trim();
+  localStorage.setItem("meta_token", TOKEN);
+  localStorage.setItem("meta_act", ACT);
+  fetchAll();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+const fmtN  = (n,d=2) => n==null?"—":Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtR  = (n) => n==null?"—":`R$ ${fmtN(n)}`;
+const fmtP  = (n) => n==null?"—":`${fmtN(n,1)}%`;
+const fmtI  = (n) => n==null?"—":Number(n).toLocaleString("pt-BR");
+
+function getAction(ins, type) {
+  const acts = ins?.data?.[0]?.actions;
+  if (!acts) return null;
+  const a = acts.find(x=>x.action_type===type);
+  return a ? Number(a.value) : null;
+}
+function getCPA(ins, type) {
+  const cpa = ins?.data?.[0]?.cost_per_action_type;
+  if (!cpa) return null;
+  const a = cpa.find(x=>x.action_type===type);
+  return a ? Number(a.value) : null;
+}
+
+// ── SCORE HELPERS ─────────────────────────────────────────────────────────
+const SCORE_MAP = {
+  "ABOVE_AVERAGE":     { label:"Acima da média",  color:"#5bad85", pct:92, desc:"Top 35% dos anúncios no leilão" },
+  "AVERAGE":           { label:"Na média",         color:"#d4956a", pct:55, desc:"Dentro do intervalo médio esperado" },
+  "BELOW_AVERAGE_10":  { label:"Abaixo (top 10%)", color:"#e07070", pct:38, desc:"Pior que 90% dos anúncios no leilão" },
+  "BELOW_AVERAGE_20":  { label:"Abaixo (top 20%)", color:"#e07070", pct:25, desc:"Pior que 80% dos anúncios no leilão" },
+  "BELOW_AVERAGE_35":  { label:"Crítico (top 35%)",color:"#c0392b", pct:12, desc:"Pior que 65% — custo muito elevado" },
+};
+
+function scoreCard(title, icon, raw) {
+  if (!raw || raw === "UNKNOWN") {
+    return `<div class="score-card">
+      <div class="sc-lbl">${icon} ${title}</div>
+      <div class="sc-val" style="color:#333;">Sem dados suficientes</div>
+      <div class="sc-bar-track"><div class="sc-bar-fill" style="width:0%;background:#1a1a1a;"></div></div>
+      <div class="sc-desc">Necessário pelo menos 500 impressões no período.</div>
+    </div>`;
+  }
+  const s = SCORE_MAP[raw] || { label: raw, color:"#555", pct:0, desc:"" };
+  return `<div class="score-card">
+    <div class="sc-lbl">${icon} ${title}</div>
+    <div class="sc-val" style="color:${s.color};">${s.label}</div>
+    <div class="sc-bar-track"><div class="sc-bar-fill" style="width:${s.pct}%;background:${s.color};"></div></div>
+    <div class="sc-desc">${s.desc}</div>
+  </div>`;
+}
+
+function adScoreBlock(ins, adName) {
+  const d = ins?.data?.[0];
+  if (!d) return "";
+  const qr  = d.quality_ranking;
+  const er  = d.engagement_rate_ranking;
+  const cr  = d.conversion_rate_ranking;
+  if (!qr && !er && !cr) return "";
+
+  // Overall score logic
+  const vals = [qr,er,cr].filter(Boolean);
+  const hasCritical = vals.some(v=>v?.includes("BELOW_AVERAGE"));
+  const allAbove = vals.every(v=>v==="ABOVE_AVERAGE");
+  const overallColor = allAbove?"#5bad85":hasCritical?"#e07070":"#d4956a";
+  const overallLabel = allAbove?"🟢 Saudável":hasCritical?"🔴 Atenção necessária":"🟡 Médio";
+
+  return `<div style="margin-top:10px;padding:10px 12px;background:#080808;border:1px solid #181818;border-radius:6px;">
+    <div style="font-size:10px;color:#2a2a2a;font-family:monospace;margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em;">Relevance Diagnostics</div>
+    <div style="font-size:12px;color:${overallColor};font-family:monospace;margin-bottom:8px;">${overallLabel}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      ${qr?`<div style="padding:4px 8px;background:#0d0d0d;border:1px solid ${(SCORE_MAP[qr]||{}).color||"#333"}22;border-radius:4px;">
+        <div style="font-size:9px;color:#3a3a3a;text-transform:uppercase;letter-spacing:.08em;">Qualidade</div>
+        <div style="font-size:11px;color:${(SCORE_MAP[qr]||{}).color||"#555"};font-family:monospace;">${(SCORE_MAP[qr]||{label:qr}).label}</div>
+      </div>`:""}
+      ${er?`<div style="padding:4px 8px;background:#0d0d0d;border:1px solid ${(SCORE_MAP[er]||{}).color||"#333"}22;border-radius:4px;">
+        <div style="font-size:9px;color:#3a3a3a;text-transform:uppercase;letter-spacing:.08em;">Engajamento</div>
+        <div style="font-size:11px;color:${(SCORE_MAP[er]||{}).color||"#555"};font-family:monospace;">${(SCORE_MAP[er]||{label:er}).label}</div>
+      </div>`:""}
+      ${cr?`<div style="padding:4px 8px;background:#0d0d0d;border:1px solid ${(SCORE_MAP[cr]||{}).color||"#333"}22;border-radius:4px;">
+        <div style="font-size:9px;color:#3a3a3a;text-transform:uppercase;letter-spacing:.08em;">Conversão</div>
+        <div style="font-size:11px;color:${(SCORE_MAP[cr]||{}).color||"#555"};font-family:monospace;">${(SCORE_MAP[cr]||{label:cr}).label}</div>
+      </div>`:""}
+    </div>
+  </div>`;
+}
+function insVal(ins, key) {
+  const v = ins?.data?.[0]?.[key];
+  return v != null ? Number(v) : null;
+}
+function badge(status) {
+  const labels = {ACTIVE:"Ativo",PAUSED:"Pausado",ARCHIVED:"Arquivado",CAMPAIGN_PAUSED:"Camp. Pausada"};
+  return `<span class="badge badge-${status}">${labels[status]||status}</span>`;
+}
+function mcard(label, value, color, sub="") {
+  return `<div class="mcard"><div class="lbl">${label}</div><div class="val" style="color:${color}">${value}</div>${sub?`<div class="sub">${sub}</div>`:""}</div>`;
+}
+function miniCell(k, v) {
+  return `<div class="mini-cell"><div class="mk">${k}</div><div class="mv">${v}</div></div>`;
+}
+function sectionHead(id, title, count) {
+  return `<div class="section-head" onclick="toggleSection('${id}')"><span>${title}${count!=null?` <span style="color:#444">(${count})</span>`:""}</span><span class="arrow" id="arr-${id}">▼</span></div>`;
+}
+
+const openSections = {account:true, campaigns:true, adsets:false, ads:false, audiences:false, pixels:false};
+function toggleSection(id) {
+  openSections[id] = !openSections[id];
+  const body = document.getElementById(`sec-${id}`);
+  const arr  = document.getElementById(`arr-${id}`);
+  if (body) body.classList.toggle("hidden", !openSections[id]);
+  if (arr)  arr.textContent = openSections[id] ? "▲" : "▼";
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────
+function setProgress(pct, label) {
+  document.getElementById("progress-bar").style.width = pct+"%";
+  document.getElementById("progress-label").textContent = label;
+}
+
+// ── API CALL ──────────────────────────────────────────────────────────────
+async function mFetch(path, extra={}) {
+  const params = new URLSearchParams({ path, token: TOKEN, ...extra });
+  const r = await fetch(`/api/meta?${params}`);
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d;
+}
+
+// ── FETCH ALL ─────────────────────────────────────────────────────────────
+async function fetchAll() {
+  const btn = document.getElementById("btn-refresh");
+  btn.disabled = true; btn.textContent = "⏳";
+  document.getElementById("error-wrap").classList.add("hidden");
+  document.getElementById("loading").classList.remove("hidden");
+  document.getElementById("progress-wrap").classList.remove("hidden");
+  document.getElementById("content").classList.add("hidden");
+  const dp = document.getElementById("date-preset").value;
+
+  try {
+    setProgress(10, "Buscando dados da conta...");
+    const account = await mFetch(`${ACT}`, { fields:"name,account_status,currency,timezone_name,amount_spent,balance" });
+    document.getElementById("acct-name").textContent = account.name || "Arena Publicidade";
+
+    setProgress(25, "Buscando insights gerais...");
+    const acctIns = await mFetch(`${ACT}/insights`, { fields:INSIGHT_FIELDS, date_preset:dp, level:"account" });
+
+    setProgress(40, "Buscando campanhas...");
+    const campsR = await mFetch(`${ACT}/campaigns`, { fields:`id,name,status,objective,daily_budget,lifetime_budget,budget_remaining,insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit:50 });
+
+    setProgress(55, "Buscando conjuntos de anúncios...");
+    const adsetsR = await mFetch(`${ACT}/adsets`, { fields:`id,name,status,campaign_id,targeting,daily_budget,optimization_goal,insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit:100 });
+
+    setProgress(70, "Buscando anúncios e criativos...");
+    const adsR = await mFetch(`${ACT}/ads`, { fields:`id,name,status,adset_id,campaign_id,creative{id,name,title,body,image_url,thumbnail_url,call_to_action_type},insights.date_preset(${dp}){${INSIGHT_FIELDS}}`, limit:100 });
+
+    setProgress(82, "Buscando públicos personalizados...");
+    let audiences = [];
+    try { const a = await mFetch(`${ACT}/customaudiences`, { fields:"id,name,subtype,approximate_count_lower_bound,approximate_count_upper_bound", limit:50 }); audiences = a.data||[]; } catch {}
+
+    setProgress(88, "Buscando pixel...");
+    let pixels = [];
+    try { const p = await mFetch(`${ACT}/adspixels`, { fields:"id,name,last_fired_time", limit:10 }); pixels = p.data||[]; } catch {}
+
+    // ── DELAY ANALYSIS — attribution windows comparison ──────────────────
+    setProgress(93, "Analisando janelas de atribuição (delay detector)...");
+    const ATT_FIELDS = "spend,impressions,clicks,actions,action_attribution_windows";
+    let insToday = null, ins3d = null, ins7d = null;
+    try {
+      insToday = await mFetch(`${ACT}/insights`, { fields:ATT_FIELDS, date_preset:"today",     level:"account", action_attribution_windows:"['1d_click','7d_click','28d_click','1d_view']" });
+      ins3d    = await mFetch(`${ACT}/insights`, { fields:ATT_FIELDS, date_preset:"last_3d",   level:"account", action_attribution_windows:"['1d_click','7d_click','28d_click','1d_view']" });
+      ins7d    = await mFetch(`${ACT}/insights`, { fields:ATT_FIELDS, date_preset:"last_7d",   level:"account", action_attribution_windows:"['1d_click','7d_click','28d_click','1d_view']" });
+    } catch {}
+
+    setProgress(100, "Concluído ✓");
+    await new Promise(r=>setTimeout(r,300));
+
+    renderAll({ account, acctIns, camps:campsR.data||[], adsets:adsetsR.data||[], ads:adsR.data||[], audiences, pixels, insToday, ins3d, ins7d });
+
+  } catch(e) {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("progress-wrap").classList.add("hidden");
+    const eb = document.getElementById("error-wrap");
+    eb.classList.remove("hidden");
+    eb.innerHTML = `<div class="error-box"><strong>Erro na API Meta:</strong> ${e.message}<small>Verifique se o token tem permissões ads_read e ads_management, ou se não expirou.</small></div>`;
+  }
+  btn.disabled = false; btn.textContent = "↻ Atualizar";
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function renderAll(d) {
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("progress-wrap").classList.add("hidden");
+
+  // Dot row
+  const camps_ids = d.camps.map(c=>c.id);
+  const dotRow = document.getElementById("dot-row");
+  dotRow.innerHTML = d.camps.slice(0,8).map(c=>{
+    const col = c.status==="ACTIVE"?"#5bad85":c.status==="PAUSED"?"#d4956a":"#333";
+    return `<div class="dot" style="background:${col}" title="${c.name}"></div>`;
+  }).join("");
+
+  // Account insight values
+  const ai = d.acctIns;
+  const spend    = insVal(ai,"spend");
+  const impr     = insVal(ai,"impressions");
+  const clicks   = insVal(ai,"clicks");
+  const reach    = insVal(ai,"reach");
+  const ctr      = insVal(ai,"ctr");
+  const cpc      = insVal(ai,"cpc");
+  const cpm      = insVal(ai,"cpm");
+  const freq     = insVal(ai,"frequency");
+  const purchases= getAction(ai,"purchase");
+  const leads    = getAction(ai,"lead");
+  const addCart  = getAction(ai,"add_to_cart");
+  const viewC    = getAction(ai,"view_content");
+  const cpPurch  = getCPA(ai,"purchase");
+  const cpLead   = getCPA(ai,"lead");
+  const amtSpent = d.account.amount_spent ? Number(d.account.amount_spent)/100 : null;
+
+  // Color logic
+  const ctrCol  = ctr>1.5?"#5bad85":ctr>0.8?"#d4956a":"#e07070";
+  const freqCol = freq>3.5?"#e07070":freq>2?"#d4956a":"#5bad85";
+
+  let html = "";
+
+  // ── ACCOUNT ──
+  html += sectionHead("account","Conta");
+  html += `<div id="sec-account" class="section-body">`;
+  html += `<div class="grid">
+    ${mcard("Gasto no período", fmtR(spend), "var(--acc)")}
+    ${mcard("Impressões", fmtI(impr), "#6a9e8e")}
+    ${mcard("Cliques", fmtI(clicks), "#9b7dbf")}
+    ${mcard("Alcance", fmtI(reach), "#6a8eb5")}
+    ${mcard("CTR", fmtP(ctr), ctrCol)}
+    ${mcard("CPC", fmtR(cpc), "#b86e6e")}
+    ${mcard("CPM", fmtR(cpm), "#8e8e6a")}
+    ${mcard("Frequência", fmtN(freq,1), freqCol)}
+  </div>`;
+
+  // Conversões
+  const convCards = [
+    purchases!=null ? mcard("Compras",purchases,"#5bad85",cpPurch?`CPA: ${fmtR(cpPurch)}`:"") : "",
+    leads!=null ? mcard("Leads",leads,"#6a9e8e",cpLead?`CPL: ${fmtR(cpLead)}`:"") : "",
+    addCart!=null ? mcard("Add to Cart",addCart,"#9b7dbf") : "",
+    viewC!=null ? mcard("View Content",fmtI(viewC),"#6a8eb5") : "",
+  ].filter(Boolean);
+  if (convCards.length) {
+    html += `<div style="font-size:10px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-bottom:8px;">Eventos de Conversão</div>`;
+    html += `<div class="grid">${convCards.join("")}</div>`;
+  }
+
+  // Meta info
+  html += `<div class="grid-sm">
+    ${[["Moeda",d.account.currency],["Fuso",d.account.timezone_name],
+       ["Status conta",d.account.account_status===1?"✓ Ativa":"⚠ Restrita"],
+       ["Gasto total histórico",amtSpent?fmtR(amtSpent):"—"],
+       ["Pixels encontrados",d.pixels.length],
+       ["Públicos personalizados",d.audiences.length]
+    ].map(([k,v])=>`<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}
+  </div>`;
+  html += `</div>`; // sec-account
+
+  // ── SCORES OCULTOS — conta ──
+  const acctQR = ai?.data?.[0]?.quality_ranking;
+  const acctER = ai?.data?.[0]?.engagement_rate_ranking;
+  const acctCR = ai?.data?.[0]?.conversion_rate_ranking;
+  html += `<div class="score-section">
+    <div class="sc-header"><span>◈</span> SCORES OCULTOS — Relevance Diagnostics da Conta</div>
+    <div style="font-size:12px;color:#3a3a3a;margin-bottom:14px;line-height:1.55;">
+      Scores que a Meta não mostra na interface. Medem a qualidade dos seus anúncios vs. todos os concorrentes no mesmo leilão.<br>
+      <span style="color:#555;">Disponíveis por anúncio quando há volume suficiente de impressões no período selecionado.</span>
+    </div>
+    <div class="score-grid">
+      ${scoreCard("Quality Ranking","🔍", acctQR)}
+      ${scoreCard("Engagement Rate Ranking","💬", acctER)}
+      ${scoreCard("Conversion Rate Ranking","🎯", acctCR)}
+    </div>
+    <div style="font-size:11px;color:#2a2a2a;font-family:monospace;line-height:1.6;">
+      ℹ️  <strong style="color:#444;">Como interpretar:</strong> Abaixo da média = seu anúncio perde leilões → CPC/CPM sobem.
+      Melhore o criativo (qualidade), o copy e o match de oferta/público (conversão).
+      Scores por anúncio aparecem nas seções abaixo.
+    </div>
+  </div>`;
+
+  // ── DELAY DETECTOR — janelas de atribuição ───────────────────────────
+  {
+    const convTypes = [
+      { key:"purchase",    label:"Compras"     },
+      { key:"lead",        label:"Leads"       },
+      { key:"add_to_cart", label:"Add to Cart" },
+    ];
+
+    const spendToday = d.insToday?.data?.[0]?.spend ? Number(d.insToday.data[0].spend) : null;
+    const spend3d    = d.ins3d?.data?.[0]?.spend    ? Number(d.ins3d.data[0].spend)    : null;
+
+    const delayRows = convTypes.map(ct => {
+      const vToday = getAction(d.insToday, ct.key);
+      const v3d    = getAction(d.ins3d,    ct.key);
+      const v7d    = getAction(d.ins7d,    ct.key);
+      if (vToday == null && v3d == null && v7d == null) return null;
+      const gap    = (v3d != null && vToday != null) ? Math.max(0, v3d - vToday) : null;
+      const gapPct = (gap && v3d) ? Math.round((gap / v3d) * 100) : 0;
+      const risk   = gapPct > 40 ? "🔴" : gapPct > 15 ? "🟡" : "🟢";
+      const gapCol = gapPct > 40 ? "#e07070" : gapPct > 15 ? "#d4956a" : "#5bad85";
+      return `<tr style="border-bottom:1px solid #141414;">
+        <td style="padding:8px 10px;font-size:12.5px;color:var(--txt);">${ct.label}</td>
+        <td style="padding:8px 10px;font-size:13px;font-family:monospace;text-align:center;color:${vToday>0?"#5bad85":"#444"};">${vToday??'—'}</td>
+        <td style="padding:8px 10px;font-size:13px;font-family:monospace;text-align:center;color:var(--acc);">${v3d??'—'}</td>
+        <td style="padding:8px 10px;font-size:13px;font-family:monospace;text-align:center;color:#6a8eb5;">${v7d??'—'}</td>
+        <td style="padding:8px 10px;font-size:12px;font-family:monospace;text-align:center;color:${gapCol};">
+          ${gap!=null ? `${risk} ${gap>0?"+"+gap+" delay":"OK"}` : "—"}
+        </td>
+      </tr>`;
+    }).filter(Boolean);
+
+    html += `<div class="score-section" style="border-color:#1e1c12;">
+      <div class="sc-header"><span>⏱</span> DELAY DETECTOR — Janelas de Atribuição</div>
+      <div style="font-size:12px;color:#3a3a3a;margin-bottom:14px;line-height:1.6;">
+        O Meta atrasa até <strong style="color:#d4956a;">72h</strong> para registrar conversões por clique.
+        Comparar janelas evita pausar campanha lucrativa ainda em consolidação.<br>
+        <span style="color:#2a2a2a;">Hoje = últimas 24h &nbsp;·&nbsp; 3d = últimos 3 dias &nbsp;·&nbsp; 7d = últimos 7 dias</span>
+      </div>
+      ${(spendToday!=null||spend3d!=null) ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+        ${spendToday!=null?`<div class="mcard" style="flex:1;min-width:120px;"><div class="lbl">Gasto hoje</div><div class="val" style="color:var(--acc);font-size:16px;">${fmtR(spendToday)}</div></div>`:""}
+        ${spend3d!=null?`<div class="mcard" style="flex:1;min-width:120px;"><div class="lbl">Gasto 3 dias</div><div class="val" style="color:#d4956a;font-size:16px;">${fmtR(spend3d)}</div></div>`:""}
+      </div>` : ""}
+      ${delayRows.length ? `
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="border-bottom:1px solid #1c1c1c;">
+            <th style="padding:6px 10px;text-align:left;font-size:10px;letter-spacing:.15em;color:#2a2a2a;text-transform:uppercase;font-weight:400;">Evento</th>
+            <th style="padding:6px 10px;text-align:center;font-size:10px;color:#5bad85;text-transform:uppercase;font-weight:400;">Hoje</th>
+            <th style="padding:6px 10px;text-align:center;font-size:10px;color:#d4956a;text-transform:uppercase;font-weight:400;">3 Dias</th>
+            <th style="padding:6px 10px;text-align:center;font-size:10px;color:#6a8eb5;text-transform:uppercase;font-weight:400;">7 Dias</th>
+            <th style="padding:6px 10px;text-align:center;font-size:10px;color:#555;text-transform:uppercase;font-weight:400;">Gap</th>
+          </tr></thead>
+          <tbody>${delayRows.join("")}</tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:#2a2a2a;font-family:monospace;line-height:1.7;">
+        🔴 Gap alto → conversões ainda chegando. <strong style="color:#444;">Não pause.</strong> Aguarde 48-72h.<br>
+        🟡 Gap médio → aguarde 24-48h antes de decidir escala ou pausa.<br>
+        🟢 Sem gap → dados consolidados, decisão segura agora.
+      </div>` : `<div style="color:#2a2a2a;font-size:12.5px;font-family:monospace;">Sem conversões registradas no período. Amplie para "Últimos 7 dias".</div>`}
+    </div>`;
+  }
+
+  if (d.pixels.length) {
+    html += `<div style="margin-bottom:20px;">`;
+    html += `<div style="font-size:10px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-bottom:10px;">Pixel</div>`;
+    d.pixels.forEach(px=>{
+      const lastFired = px.last_fired_time ? new Date(px.last_fired_time).toLocaleDateString("pt-BR") : null;
+      html += `<div class="pixel-row">
+        <div style="font-size:18px;">◈</div>
+        <div style="flex:1">
+          <div style="font-size:13px;">${px.name}</div>
+          <div style="font-size:11px;color:var(--dim);font-family:monospace;">ID: ${px.id}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--dim);">Último disparo</div>
+          <div style="font-size:12px;color:${lastFired?"#5bad85":"#e07070"};font-family:monospace;">${lastFired||"Nunca"}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── CAMPANHAS ──
+  html += sectionHead("campaigns","Campanhas",d.camps.length);
+  html += `<div id="sec-campaigns" class="section-body">`;
+  if (!d.camps.length) { html += `<div style="color:var(--dim);font-size:13px;">Nenhuma campanha encontrada.</div>`; }
+  d.camps.forEach(c=>{
+    const ci = c.insights;
+    const cs = insVal(ci,"spend"), cc = insVal(ci,"ctr"), ccp = insVal(ci,"cpc");
+    const ci2 = insVal(ci,"impressions"), cf = insVal(ci,"frequency");
+    const cp = getAction(ci,"purchase"), cl = getAction(ci,"lead");
+    const cpa = getCPA(ci,"purchase")||getCPA(ci,"lead");
+    html += `<div class="camp-card">
+      <div class="camp-head">
+        <div>
+          <div class="camp-name">${c.name}</div>
+          <div class="camp-meta">${badge(c.status)}<span style="font-size:11px;color:var(--dim);font-family:monospace;">${c.objective||""}</span></div>
+        </div>
+        <div style="text-align:right">
+          <div class="camp-spend">${fmtR(cs)}</div>
+          <div style="font-size:10px;color:var(--dim);">gasto no período</div>
+        </div>
+      </div>
+      <div class="mini-grid">
+        ${miniCell("Impressões",fmtI(ci2))}
+        ${miniCell("CTR",fmtP(cc))}
+        ${miniCell("CPC",fmtR(ccp))}
+        ${miniCell("Freq.",fmtN(cf,1))}
+        ${cp!=null?miniCell("Compras",cp):""}
+        ${cl!=null?miniCell("Leads",cl):""}
+        ${cpa!=null?miniCell("CPA",fmtR(cpa)):""}
+      </div>
+      ${c.daily_budget||c.lifetime_budget?`<div style="margin-top:8px;font-size:11px;color:var(--dim);font-family:monospace;">
+        ${c.daily_budget?`Budget diário: ${fmtR(Number(c.daily_budget)/100)}`:""}
+        ${c.lifetime_budget?`Budget total: ${fmtR(Number(c.lifetime_budget)/100)}`:""}
+        ${c.budget_remaining?` · Restante: ${fmtR(Number(c.budget_remaining)/100)}`:""}
+      </div>`:""}
+      ${adScoreBlock(ci, c.name)}
+    </div>`;
+  });
+  html += `</div>`;
+
+  // ── ADSETS ──
+  html += sectionHead("adsets","Conjuntos de Anúncios",d.adsets.length);
+  html += `<div id="sec-adsets" class="section-body hidden">`;
+  d.adsets.forEach(as=>{
+    const ai2 = as.insights;
+    const as_s=insVal(ai2,"spend"), as_ctr=insVal(ai2,"ctr"), as_cpc=insVal(ai2,"cpc");
+    const as_i=insVal(ai2,"impressions"), as_f=insVal(ai2,"frequency");
+    const as_p=getAction(ai2,"purchase"), as_l=getAction(ai2,"lead");
+    const t = as.targeting||{};
+    const ages = (t.age_min||t.age_max)?`${t.age_min||"—"}–${t.age_max||"—"} anos`:"";
+    const genders = t.genders?(t.genders.includes(1)&&t.genders.includes(2)?"M+F":t.genders.includes(1)?"Masc":"Fem"):"Todos";
+    const interests = t.flexible_spec?.[0]?.interests?.slice(0,5)||[];
+    const geo = t.geo_locations?.countries?.join(", ")||t.geo_locations?.cities?.map(x=>x.name).join(", ")||"";
+    html += `<div class="camp-card">
+      <div class="camp-head">
+        <div>
+          <div class="camp-name">${as.name}</div>
+          <div class="camp-meta">${badge(as.status)}<span style="font-size:11px;color:var(--dim);font-family:monospace;">${as.optimization_goal||""}</span>${ages?`<span style="font-size:11px;color:var(--dim);">· ${ages}</span>`:""}<span style="font-size:11px;color:var(--dim);">· ${genders}</span></div>
+        </div>
+        <div class="camp-spend" style="font-size:14px;">${fmtR(as_s)}</div>
+      </div>
+      <div class="mini-grid">
+        ${miniCell("CTR",fmtP(as_ctr))}${miniCell("CPC",fmtR(as_cpc))}${miniCell("Impr.",fmtI(as_i))}${miniCell("Freq.",fmtN(as_f,1))}
+        ${as_p!=null?miniCell("Compras",as_p):""}${as_l!=null?miniCell("Leads",as_l):""}
+      </div>
+      ${geo?`<div style="margin-top:6px;font-size:11px;color:#3a3a3a;font-family:monospace;">📍 ${geo}</div>`:""}
+      ${interests.length?`<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;">${interests.map(i=>`<span class="tag">${i.name}</span>`).join("")}</div>`:""}
+    </div>`;
+  });
+  html += `</div>`;
+
+  // ── ADS ──
+  html += sectionHead("ads","Anúncios",d.ads.length);
+  html += `<div id="sec-ads" class="section-body hidden">`;
+  d.ads.forEach(ad=>{
+    const adi=ad.insights;
+    const ad_s=insVal(adi,"spend"),ad_ctr=insVal(adi,"ctr"),ad_cpc=insVal(adi,"cpc");
+    const ad_i=insVal(adi,"impressions"),ad_f=insVal(adi,"frequency");
+    const ad_p=getAction(adi,"purchase"),ad_l=getAction(adi,"lead");
+    const cr=ad.creative||{};
+    html += `<div class="ad-card">
+      <div class="ad-row">
+        ${cr.thumbnail_url?`<img class="ad-thumb" src="${cr.thumbnail_url}" onerror="this.style.display='none'" alt=""/>`:""}
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+            <div style="font-size:12.5px;line-height:1.3;">${ad.name}</div>
+            ${badge(ad.status)}
+          </div>
+          ${cr.title?`<div style="font-size:11.5px;color:var(--acc);margin-bottom:2px;">${cr.title}</div>`:""}
+          ${cr.body?`<div style="font-size:11px;color:var(--dim);line-height:1.45;">${(cr.body||"").slice(0,120)}${(cr.body||"").length>120?"...":""}</div>`:""}
+          ${cr.call_to_action_type?`<span class="cta-tag">${cr.call_to_action_type}</span>`:""}
+        </div>
+      </div>
+      <div class="mini-grid" style="margin-top:8px;">
+        ${miniCell("Gasto",fmtR(ad_s))}${miniCell("CTR",fmtP(ad_ctr))}${miniCell("CPC",fmtR(ad_cpc))}${miniCell("Impr.",fmtI(ad_i))}${miniCell("Freq.",fmtN(ad_f,1))}
+        ${ad_p!=null?miniCell("Compras",ad_p):""}${ad_l!=null?miniCell("Leads",ad_l):""}
+      </div>
+      ${adScoreBlock(adi, ad.name)}
+    </div>`;
+  });
+  html += `</div>`;
+
+  // ── PÚBLICOS ──
+  if (d.audiences.length) {
+    html += sectionHead("audiences","Públicos Personalizados",d.audiences.length);
+    html += `<div id="sec-audiences" class="section-body hidden">`;
+    d.audiences.forEach(au=>{
+      html += `<div class="aud-row">
+        <div><div style="font-size:13px;">${au.name}</div><div style="font-size:11px;color:var(--dim);font-family:monospace;">${au.subtype}</div></div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:#6a8eb5;font-family:monospace;">${au.approximate_count_lower_bound?Number(au.approximate_count_lower_bound).toLocaleString("pt-BR")+"+":" —"}</div>
+          <div style="font-size:10px;color:var(--dim);">pessoas</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById("content").innerHTML = html;
+  document.getElementById("content").classList.remove("hidden");
+
+  // Restore section states
+  Object.entries(openSections).forEach(([id,open])=>{
+    const el = document.getElementById(`sec-${id}`);
+    const arr = document.getElementById(`arr-${id}`);
+    if (el) el.classList.toggle("hidden", !open);
+    if (arr) arr.textContent = open?"▲":"▼";
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+document.getElementById("date-preset").addEventListener("change", fetchAll);
+fetchAll();
+</script>
+</body>
+</html>

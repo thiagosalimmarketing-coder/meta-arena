@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VÓRTEX · Tracking</title>
+<style>
+  :root {
+    --bg:#090909; --surf:#0f0f0f; --surf2:#111;
+    --brd:#1c1c1c; --brd2:#222;
+    --txt:#ebe7e1; --dim:#555; --dim2:#333;
+    --acc:#d4956a; --green:#5bad85; --red:#e07070;
+    --yellow:#d4c06a; --blue:#6a8eb5; --purple:#9b7dbf;--vortex:#b57dbf;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:Georgia,serif;font-size:14px;min-height:100vh}
+  input,select{background:var(--surf);border:1px solid var(--brd);color:var(--txt);
+    padding:9px 13px;border-radius:7px;font-size:13px;outline:none;font-family:monospace;transition:border-color .15s;width:100%}
+  input:focus{border-color:var(--acc)}
+  button{cursor:pointer;font-family:Georgia,serif;font-weight:600;border:none;border-radius:7px;transition:all .15s}
+  button:hover:not(:disabled){opacity:.82}
+  button:disabled{opacity:.35;cursor:not-allowed}
+  ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+
+  /* NAV */
+  #nav{border-bottom:1px solid var(--brd);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .nav-sub{font-size:10px;letter-spacing:.35em;color:#282828;text-transform:uppercase;margin-bottom:2px}
+  .nav-title{font-size:17px;font-weight:400}
+
+  /* MAIN */
+  #main{max-width:900px;margin:0 auto;padding:28px 20px}
+
+  /* CLIENT CARDS */
+  .clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px}
+  .client-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .2s;position:relative}
+  .client-card:hover{border-color:#333}
+  .client-card.selected{border-color:var(--acc);background:#d4956a08}
+  .client-card .cc-name{font-size:13.5px;color:var(--txt);margin-bottom:4px}
+  .client-card .cc-url{font-size:11px;color:var(--dim);font-family:monospace}
+  .client-card .cc-type{font-size:10px;padding:2px 7px;border-radius:20px;background:#1a1a1a;color:#444;margin-top:6px;display:inline-block;font-family:monospace}
+
+  /* URL INPUT AREA */
+  #url-area{margin-bottom:20px}
+  .url-row{display:flex;gap:8px;align-items:center}
+  .url-row input{flex:1}
+
+  /* SECTION TITLE */
+  .sec-title{font-size:10.5px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .sec-title span{color:var(--acc)}
+
+  /* CHECK CARD */
+  .check-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:16px;margin-bottom:10px}
+  .check-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .check-icon{font-size:20px;flex-shrink:0}
+  .check-name{font-size:14px;font-weight:600}
+  .check-status{margin-left:auto;padding:4px 12px;border-radius:20px;font-size:12px;font-family:monospace;font-weight:600}
+  .s-ok{background:#5bad8520;border:1px solid #5bad8540;color:#5bad85}
+  .s-warn{background:#d4956a20;border:1px solid #d4956a40;color:#d4956a}
+  .s-err{background:#e0707020;border:1px solid #e0707040;color:#e07070}
+  .s-na{background:#55555520;border:1px solid #55555530;color:#555}
+  .s-checking{background:#d4c06a15;border:1px solid #d4c06a30;color:#d4c06a;animation:pulse 1s infinite}
+
+  /* FINDINGS */
+  .findings{display:flex;flex-direction:column;gap:6px}
+  .finding{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:6px;font-size:12.5px}
+  .finding-ok{background:#5bad8508;border:1px solid #5bad8520}
+  .finding-warn{background:#d4956a08;border:1px solid #d4956a20}
+  .finding-err{background:#e0707008;border:1px solid #e0707020}
+  .finding-info{background:#6a8eb508;border:1px solid #6a8eb520}
+  .finding .fi{flex-shrink:0;margin-top:1px}
+  .finding .ft{flex:1;line-height:1.45}
+  .finding .fc{font-size:11px;color:var(--dim);font-family:monospace;margin-top:2px}
+
+  /* IDS found */
+  .id-chip{display:inline-block;padding:3px 9px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;font-size:11.5px;font-family:monospace;color:var(--acc);margin:2px}
+
+  /* SCORE */
+  #score-section{background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:20px;margin-bottom:24px;display:none}
+  #score-circle{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;font-family:monospace;flex-shrink:0}
+  #score-wrap{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+  #score-summary{flex:1}
+  #score-label{font-size:16px;margin-bottom:6px}
+  #score-issues{font-size:12.5px;color:var(--dim);line-height:1.6}
+
+  /* SUGGESTIONS */
+  .sug-item{padding:12px 14px;background:var(--surf);border:1px solid var(--brd2);border-radius:7px;margin-bottom:8px;display:flex;gap:10px}
+  .sug-icon{font-size:16px;flex-shrink:0}
+  .sug-body .sug-title{font-size:13px;margin-bottom:3px}
+  .sug-body .sug-desc{font-size:12px;color:var(--dim);line-height:1.5}
+  .sug-body .sug-action{font-size:11px;color:var(--acc);font-family:monospace;margin-top:4px}
+
+  /* META PIXEL FROM API */
+  .pixel-api-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#0d0d0d;border:1px solid #181818;border-radius:6px;margin-bottom:6px}
+
+  /* BUTTONS */
+  .btn-primary{padding:11px 24px;background:var(--acc);color:#080808;font-size:13.5px}
+  .btn-ghost{padding:9px 18px;background:transparent;border:1px solid var(--brd2);color:var(--dim);font-size:13px}
+  .btn-sm{padding:5px 12px;font-size:11.5px}
+
+  /* LOADING */
+  .loading-bar{height:3px;background:var(--brd);border-radius:2px;overflow:hidden;margin-bottom:8px}
+  .loading-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--purple));transition:width .4s ease}
+
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .fade{animation:fadeIn .3s ease}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <div>
+    <div class="nav-sub">VÓRTEX · INTELLIGENCE PLATFORM</div>
+    <div class="nav-title">🔬 VÓRTEX · Tracking</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a href="/index.html" style="padding:7px 14px;border-radius:6px;background:transparent;border:1px solid var(--brd2);color:var(--dim);font-size:12px;font-family:monospace;text-decoration:none;">← Dashboard</a>
+    <a href="/squads.html" style="padding:6px 13px;border-radius:6px;background:#e0707015;border:1px solid #e0707030;color:#e07070;font-size:12px;font-family:monospace;text-decoration:none">⚡ Squads</a>
+    <a href="/utm.html" style="padding:6px 13px;border-radius:6px;background:#d4956a15;border:1px solid #d4956a30;color:#d4956a;font-size:12px;font-family:monospace;text-decoration:none">📎 UTM</a>
+    <a href="/protector.html" style="padding:7px 14px;border-radius:6px;background:#e0707015;border:1px solid #e0707030;color:#e07070;font-size:12px;font-family:monospace;text-decoration:none;">🛡 Protector</a>
+  </div>
+</div>
+
+<div id="main">
+
+  <!-- CLIENT SELECTOR -->
+  <div style="margin-bottom:20px">
+    <div class="sec-title"><span>◈</span> Selecione o cliente ou cole uma URL</div>
+    <div class="clients-grid" id="client-grid"></div>
+
+    <div id="url-area">
+      <div class="url-row">
+        <input id="url-input" placeholder="https://seucliente.com.br" type="url"/>
+        <button class="btn-primary" onclick="startAudit()" id="btn-audit">🔬 Auditar</button>
+      </div>
+      <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:monospace;">
+        Verificação de: Meta Pixel · GA4 · GTM · CAPI · Eventos de conversão · Duplicações · HTTPS
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORE -->
+  <div id="score-section">
+    <div id="score-wrap">
+      <div id="score-circle"></div>
+      <div id="score-summary">
+        <div id="score-label"></div>
+        <div id="score-issues"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="progress-area" class="hidden" style="margin-bottom:20px">
+    <div class="loading-bar"><div class="loading-fill" id="prog-fill" style="width:0%"></div></div>
+    <div id="prog-label" style="font-size:12px;color:var(--dim);font-family:monospace;"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="hidden"></div>
+
+  <!-- SUGGESTIONS -->
+  <div id="suggestions-wrap" class="hidden">
+    <div class="sec-title" style="margin-top:24px"><span>⚡</span> Ações Recomendadas</div>
+    <div id="suggestions-list"></div>
+  </div>
+
+</div>
+
+<script>
+// ── CLIENTS ───────────────────────────────────────────────────────────────
+const TOKEN = localStorage.getItem("meta_token") || "EAAK0fWGyBnYBRG3xqqnYOPMKLZAakYeAR763z0fUlz63MZCRGYmtLhDZCcWZCxNJbcZAWKLl289LbuAqwiorLzFqhQo00qg9bZCZC4FO9so0ZBbLCSRGowY42GBcHMPg8WLKjacVrML9PpZA9ZAZB8N0lhwqrzSWK5rk1NUATFuGPG3WFWWJBfVNU6s81Lgh9cPgZDZD";
+const ACT   = localStorage.getItem("meta_act")   || "act_604987865349440";
+
+const CLIENTS = [
+  { name:"Arena Publicidade", url:"https://arenapublicidade.com.br", type:"B2B", color:"#d4956a" },
+  { name:"Nova Beach",        url:"https://novabeachcampinas.com.br", type:"Local", color:"#6a9e8e" },
+];
+
+let selectedClient = null;
+
+function renderClients() {
+  document.getElementById("client-grid").innerHTML = CLIENTS.map((c,i)=>`
+    <div class="client-card ${selectedClient===i?"selected":""}" onclick="selectClient(${i})">
+      <div class="cc-name">${c.name}</div>
+      <div class="cc-url">${c.url}</div>
+      <span class="cc-type">${c.type}</span>
+    </div>`).join("");
+}
+
+function selectClient(i) {
+  selectedClient = i;
+  document.getElementById("url-input").value = CLIENTS[i].url;
+  renderClients();
+}
+
+renderClients();
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────
+function setProgress(pct, label) {
+  document.getElementById("prog-fill").style.width = pct+"%";
+  document.getElementById("prog-label").textContent = label;
+}
+
+// ── FETCH SITE HTML ───────────────────────────────────────────────────────
+async function fetchSite(url) {
+  const r = await fetch(`/api/fetch-site?url=${encodeURIComponent(url)}`);
+  const d = await r.json();
+  if (d.error) throw new Error(d.error);
+  return d;
+}
+
+async function mGet(path, extra={}) {
+  const params = new URLSearchParams({ path, token:TOKEN, ...extra });
+  const r = await fetch(`/api/meta?${params}`);
+  return r.json();
+}
+
+// ── PATTERNS ─────────────────────────────────────────────────────────────
+const PATTERNS = {
+  metaPixel: {
+    id:    /fbq\s*\(\s*['"]init['"]\s*,\s*['"](\d{10,20})['"]/g,
+    code:  /fbq\s*\(/,
+    noscript: /<noscript[^>]*>[\s\S]*?facebook\.com\/tr[\s\S]*?<\/noscript>/i,
+    noConflict: /fbq\.callMethod/,
+  },
+  capi: {
+    serverSide: /conversions[\s\S]{0,200}facebook\.com/i,
+    stape:      /stape\.io/i,
+    gtmServer:  /server[- ]?side[\s\S]{0,100}gtm/i,
+  },
+  gtm: {
+    id:   /GTM-[A-Z0-9]+/g,
+    code: /googletagmanager\.com\/gtm\.js/,
+    noscript: /googletagmanager\.com\/ns\.html/,
+  },
+  ga4: {
+    id:   /G-[A-Z0-9]+/g,
+    code: /gtag\s*\(/,
+    ua:   /UA-\d+-\d+/g,
+  },
+  events: {
+    pageView:     /fbq\s*\(\s*['"]track['"]\s*,\s*['"]PageView['"]/,
+    addToCart:    /fbq\s*\(\s*['"]track['"]\s*,\s*['"]AddToCart['"]/i,
+    purchase:     /fbq\s*\(\s*['"]track['"]\s*,\s*['"]Purchase['"]/i,
+    lead:         /fbq\s*\(\s*['"]track['"]\s*,\s*['"]Lead['"]/i,
+    viewContent:  /fbq\s*\(\s*['"]track['"]\s*,\s*['"]ViewContent['"]/i,
+    initCheckout: /fbq\s*\(\s*['"]track['"]\s*,\s*['"]InitiateCheckout['"]/i,
+    contact:      /fbq\s*\(\s*['"]track['"]\s*,\s*['"]Contact['"]/i,
+    schedule:     /fbq\s*\(\s*['"]track['"]\s*,\s*['"]Schedule['"]/i,
+  },
+  https: { mixed: /http:\/\/(?!localhost)/g },
+  shopify: { code: /cdn\.shopify\.com/i },
+  wordpress: { code: /wp-content|wp-includes/i },
+  hotjar: { code: /hotjar\.com/i },
+  clarity: { code: /clarity\.ms/i },
+  tiktok: { id: /ttq\s*\(\s*['"]init['"]\s*,\s*['"](\w+)['"]/g, code: /analytics\.tiktok\.com/i },
+};
+
+// ── AUDIT ─────────────────────────────────────────────────────────────────
+async function startAudit() {
+  const url = document.getElementById("url-input").value.trim();
+  if (!url || !url.startsWith("http")) { alert("Cole uma URL válida (começando com https://)"); return; }
+
+  document.getElementById("btn-audit").disabled = true;
+  document.getElementById("btn-audit").textContent = "⏳ Auditando...";
+  document.getElementById("results").classList.add("hidden");
+  document.getElementById("suggestions-wrap").classList.add("hidden");
+  document.getElementById("score-section").style.display = "none";
+  document.getElementById("progress-area").classList.remove("hidden");
+
+  const checks = [];
+  const suggestions = [];
+  let score = 0;
+  const maxScore = 10;
+
+  try {
+    // 1. Fetch HTML
+    setProgress(10, "Baixando HTML do site...");
+    let html = "", httpStatus = 0;
+    try {
+      const site = await fetchSite(url);
+      html = site.html || "";
+      httpStatus = site.status;
+    } catch(e) {
+      checks.push({ name:"Acesso ao Site", icon:"🌐", status:"err",
+        findings:[{ type:"err", msg:"Não foi possível acessar o site", detail:e.message }] });
+    }
+
+    // 2. HTTPS check
+    setProgress(18, "Verificando HTTPS...");
+    {
+      const isHttps = url.startsWith("https://");
+      const mixedContent = (html.match(PATTERNS.https.mixed)||[]).length;
+      const f = [];
+      if (isHttps) { f.push({ type:"ok", msg:"Site usa HTTPS ✓" }); score++; }
+      else         { f.push({ type:"err", msg:"Site sem HTTPS — dados não criptografados", detail:"Isso afeta diretamente o pixel e pode bloquear eventos" }); }
+      if (mixedContent > 0) f.push({ type:"warn", msg:`${mixedContent} recursos carregados via HTTP`, detail:"Mixed content pode bloquear scripts de rastreamento" });
+      checks.push({ name:"HTTPS & Segurança", icon:"🔒", status: isHttps&&!mixedContent?"ok":!isHttps?"err":"warn", findings:f });
+    }
+
+    // 3. Meta Pixel
+    setProgress(30, "Verificando Meta Pixel...");
+    {
+      const pixelIds = [...new Set([...html.matchAll(PATTERNS.metaPixel.id)].map(m=>m[1]))];
+      const hasCode  = PATTERNS.metaPixel.code.test(html);
+      const hasNoscript = PATTERNS.metaPixel.noscript.test(html);
+      const f = [];
+      let status = "err";
+
+      if (!hasCode) {
+        f.push({ type:"err", msg:"Meta Pixel NÃO encontrado no HTML", detail:"Sem pixel instalado — nenhum evento será rastreado" });
+        suggestions.push({ icon:"🔴", title:"Instalar Meta Pixel", desc:"Pixel não detectado no site. Instale via GTM ou direto no <head>.", action:"Gerenciador de Eventos → Adicionar → Pixel → Instalar código" });
+      } else {
+        status = "ok"; score += 2;
+        f.push({ type:"ok", msg:"Código fbq() detectado ✓" });
+        if (pixelIds.length === 1) {
+          f.push({ type:"ok", msg:`Pixel ID encontrado: ${pixelIds[0]}`, detail:"ID único — sem duplicação" });
+        } else if (pixelIds.length > 1) {
+          status = "warn";
+          f.push({ type:"err", msg:`⚠️ ${pixelIds.length} Pixel IDs distintos — DUPLICAÇÃO detectada`, detail:pixelIds.join(" · ") });
+          suggestions.push({ icon:"🟠", title:"Remover pixel duplicado", desc:`Encontrados ${pixelIds.length} Pixel IDs diferentes. Pixel duplicado infla contagem e prejudica otimização.`, action:"Manter apenas 1 pixel ID — remover o duplicado do GTM ou do código" });
+        } else {
+          f.push({ type:"warn", msg:"fbq() encontrado mas ID não identificado", detail:"Pode estar em arquivo JS externo" });
+        }
+        if (!hasNoscript) {
+          f.push({ type:"warn", msg:"Tag <noscript> ausente", detail:"Usuários sem JavaScript não serão rastreados" });
+          suggestions.push({ icon:"🟡", title:"Adicionar noscript do pixel", desc:"Tag noscript garante rastreamento mesmo sem JavaScript habilitado.", action:"Adicionar <noscript> logo após <body>" });
+        } else {
+          f.push({ type:"ok", msg:"Tag <noscript> presente ✓" });
+        }
+      }
+
+      // Check pixel IDs vs Meta API
+      if (pixelIds.length && TOKEN) {
+        try {
+          const pixelData = await mGet(`${ACT}/adspixels`, { fields:"id,name,last_fired_time", limit:10 });
+          const apiPixels = pixelData.data || [];
+          pixelIds.forEach(pid => {
+            const match = apiPixels.find(p=>p.id===pid);
+            if (match) {
+              const lastFired = match.last_fired_time ? new Date(match.last_fired_time).toLocaleDateString("pt-BR") : null;
+              f.push({ type:"ok", msg:`Pixel ${pid} verificado na conta Meta ✓`, detail:`Último disparo: ${lastFired||"nunca"}` });
+            } else {
+              f.push({ type:"warn", msg:`Pixel ${pid} não encontrado na conta Meta`, detail:"ID pode estar associado a outra conta" });
+            }
+          });
+        } catch {}
+      }
+
+      checks.push({ name:"Meta Pixel", icon:"◈", status, findings:f, ids:pixelIds });
+    }
+
+    // 4. CAPI
+    setProgress(42, "Verificando Conversions API...");
+    {
+      const hasStape  = PATTERNS.capi.stape.test(html);
+      const hasServer = PATTERNS.capi.serverSide.test(html);
+      const f = [];
+      let status = "warn";
+      if (hasStape)  { f.push({ type:"ok", msg:"Stape.io detectado — CAPI ativa ✓", detail:"Server-side tracking via Stape" }); status="ok"; score++; }
+      if (hasServer) { f.push({ type:"ok", msg:"Server-side tracking detectado ✓" }); status="ok"; }
+      if (!hasStape && !hasServer) {
+        f.push({ type:"warn", msg:"CAPI não detectada no HTML", detail:"Server-side pode estar ativo via plataforma (Shopify, etc) — verificar no Gerenciador de Eventos" });
+        suggestions.push({ icon:"🟡", title:"Implementar Conversions API (CAPI)", desc:"CAPI complementa o pixel e melhora atribuição em até 30%. Essencial com iOS14+.", action:"Meta Events Manager → Configurações → Conversions API → Conectar via Stape ou integração nativa" });
+      }
+      checks.push({ name:"Conversions API (CAPI)", icon:"⚡", status, findings:f });
+    }
+
+    // 5. GTM
+    setProgress(54, "Verificando Google Tag Manager...");
+    {
+      const gtmIds  = [...new Set([...html.matchAll(PATTERNS.gtm.id)].map(m=>m[0]))];
+      const hasCode = PATTERNS.gtm.code.test(html);
+      const hasNoscript = PATTERNS.gtm.noscript.test(html);
+      const f = [];
+      let status = "na";
+      if (hasCode || gtmIds.length) {
+        status = "ok"; score++;
+        f.push({ type:"ok", msg:`GTM detectado ✓`, detail:gtmIds.join(" · ")||"" });
+        if (!hasNoscript) {
+          f.push({ type:"warn", msg:"GTM noscript ausente após <body>", detail:"Adicionar para cobertura completa" });
+          status = "warn";
+        } else {
+          f.push({ type:"ok", msg:"GTM noscript presente ✓" });
+        }
+        if (gtmIds.length > 1) {
+          f.push({ type:"err", msg:`${gtmIds.length} IDs GTM encontrados — verifique duplicação`, detail:gtmIds.join(" · ") });
+          status = "warn";
+        }
+      } else {
+        f.push({ type:"info", msg:"GTM não detectado", detail:"Pode estar sendo carregado via outro método ou ausente" });
+      }
+      checks.push({ name:"Google Tag Manager", icon:"🏷", status, findings:f, ids:gtmIds });
+    }
+
+    // 6. GA4
+    setProgress(64, "Verificando Google Analytics 4...");
+    {
+      const ga4Ids = [...new Set([...html.matchAll(PATTERNS.ga4.id)].map(m=>m[0]))];
+      const uaIds  = [...new Set([...html.matchAll(PATTERNS.ga4.ua)].map(m=>m[0]))];
+      const hasGtag = PATTERNS.ga4.code.test(html);
+      const f = [];
+      let status = "na";
+      if (ga4Ids.length) {
+        status = "ok"; score++;
+        f.push({ type:"ok", msg:`GA4 detectado ✓`, detail:ga4Ids.join(" · ") });
+      } else if (hasGtag) {
+        f.push({ type:"warn", msg:"gtag() encontrado mas ID G- não identificado", detail:"Pode estar em JS externo" });
+        status = "warn";
+      } else {
+        f.push({ type:"info", msg:"GA4 não detectado no HTML" });
+      }
+      if (uaIds.length) {
+        f.push({ type:"warn", msg:`UA (Universal Analytics) detectado — descontinuado`, detail:`${uaIds.join(" · ")} → Migrar para GA4` });
+        suggestions.push({ icon:"🟠", title:"Migrar UA para GA4", desc:`IDs Universal Analytics encontrados (${uaIds.join(", ")}). UA foi descontinuado em 2023.`, action:"Google Analytics → Criar propriedade GA4 → Instalar tag G-XXXXXX" });
+        status = "warn";
+      }
+      checks.push({ name:"Google Analytics 4", icon:"📊", status, findings:f, ids:ga4Ids });
+    }
+
+    // 7. Eventos de Conversão
+    setProgress(74, "Verificando eventos de conversão...");
+    {
+      const f = [];
+      let evCount = 0;
+      const evMap = {
+        pageView:     { label:"PageView",          critical:true  },
+        lead:         { label:"Lead",              critical:false },
+        purchase:     { label:"Purchase",          critical:false },
+        viewContent:  { label:"ViewContent",       critical:false },
+        addToCart:    { label:"AddToCart",         critical:false },
+        initCheckout: { label:"InitiateCheckout",  critical:false },
+        contact:      { label:"Contact",           critical:false },
+        schedule:     { label:"Schedule",          critical:false },
+      };
+      for (const [key, ev] of Object.entries(evMap)) {
+        const found = PATTERNS.events[key].test(html);
+        if (found) {
+          evCount++;
+          f.push({ type:"ok", msg:`${ev.label} ✓` });
+        } else if (ev.critical) {
+          f.push({ type:"err", msg:`${ev.label} não encontrado`, detail:"Evento crítico ausente" });
+        }
+      }
+      if (evCount >= 3) score++;
+      const status = evCount === 0 ? "err" : evCount >= 3 ? "ok" : "warn";
+      if (evCount === 0) {
+        suggestions.push({ icon:"🔴", title:"Eventos de conversão não configurados", desc:"Nenhum evento fbq('track') detectado no HTML. Sem eventos, o pixel não otimiza.", action:"Configurar eventos via GTM ou código no site" });
+      }
+      checks.push({ name:"Eventos de Conversão Meta", icon:"🎯", status, findings:f });
+    }
+
+    // 8. TikTok Pixel
+    setProgress(82, "Verificando TikTok Pixel...");
+    {
+      const ttkIds  = [...new Set([...html.matchAll(PATTERNS.tiktok.id)].map(m=>m[1]))];
+      const hasCode = PATTERNS.tiktok.code.test(html);
+      const f = [];
+      let status = "na";
+      if (hasCode || ttkIds.length) {
+        status = "ok";
+        f.push({ type:"ok", msg:"TikTok Pixel detectado ✓", detail:ttkIds.join(" · ")||"" });
+      } else {
+        f.push({ type:"info", msg:"TikTok Pixel não detectado", detail:"Relevante se houver campanhas no TikTok Ads" });
+      }
+      checks.push({ name:"TikTok Pixel", icon:"🎵", status, findings:f });
+    }
+
+    // 9. CMS / Plataforma
+    setProgress(88, "Identificando plataforma...");
+    {
+      const f = [];
+      if (PATTERNS.shopify.code.test(html)) {
+        f.push({ type:"ok", msg:"Shopify detectado ✓", detail:"Pixel via Shopify pode ter CAPI nativa — verificar em Marketing → Preferências" });
+        f.push({ type:"info", msg:"Dica: Shopify tem integração nativa com Meta via CAPI", detail:"Ative em Preferências da loja → Pixels do Facebook" });
+      }
+      if (PATTERNS.wordpress.code.test(html)) {
+        f.push({ type:"info", msg:"WordPress detectado", detail:"Pixel pode estar via plugin (PixelYourSite, Meta for WP)" });
+      }
+      if (PATTERNS.hotjar.code.test(html)) f.push({ type:"info", msg:"Hotjar detectado — session recording ativo" });
+      if (PATTERNS.clarity.code.test(html)) f.push({ type:"info", msg:"Microsoft Clarity detectado — heatmaps ativos" });
+      if (!f.length) f.push({ type:"info", msg:"Plataforma não identificada automaticamente" });
+      checks.push({ name:"Plataforma & Ferramentas", icon:"🛠", status:"na", findings:f });
+    }
+
+    // 10. Score final
+    setProgress(100, "Auditoria concluída ✓");
+
+    const pct = Math.round((score/maxScore)*100);
+    const scoreColor = pct >= 80 ? "#5bad85" : pct >= 50 ? "#d4956a" : "#e07070";
+    const scoreLabel = pct >= 80 ? "🟢 Tracking Saudável" : pct >= 50 ? "🟡 Tracking Parcial" : "🔴 Tracking Crítico";
+
+    document.getElementById("score-circle").style.background = scoreColor+"18";
+    document.getElementById("score-circle").style.border = `2px solid ${scoreColor}40`;
+    document.getElementById("score-circle").style.color = scoreColor;
+    document.getElementById("score-circle").textContent = `${pct}%`;
+    document.getElementById("score-label").textContent = scoreLabel;
+    document.getElementById("score-issues").textContent =
+      `${score}/${maxScore} verificações aprovadas · ${suggestions.length} ação(ões) recomendada(s) · ${new Date().toLocaleString("pt-BR")}`;
+    document.getElementById("score-section").style.display = "block";
+
+    // Render results
+    renderResults(checks, url);
+    renderSuggestions(suggestions);
+
+  } catch(e) {
+    setProgress(100, "Erro: " + e.message);
+  }
+
+  document.getElementById("btn-audit").disabled = false;
+  document.getElementById("btn-audit").textContent = "🔬 Auditar";
+  setTimeout(()=> document.getElementById("progress-area").classList.add("hidden"), 1500);
+}
+
+// ── RENDER RESULTS ────────────────────────────────────────────────────────
+function renderResults(checks, url) {
+  const statusMap = { ok:["s-ok","✓ OK"], warn:["s-warn","⚠ Alerta"], err:["s-err","✗ Crítico"], na:["s-na","— N/A"], checking:["s-checking","..."] };
+
+  const html = `
+    <div class="sec-title"><span>◈</span> Resultado da Auditoria — <span style="color:var(--dim);font-size:10px;letter-spacing:0;text-transform:none">${url}</span></div>
+    ${checks.map(c=>{
+      const [scls, slbl] = statusMap[c.status]||["s-na","—"];
+      return `<div class="check-card fade">
+        <div class="check-header">
+          <div class="check-icon">${c.icon}</div>
+          <div class="check-name">${c.name}</div>
+          <div class="check-status ${scls}">${slbl}</div>
+        </div>
+        ${c.ids?.length ? `<div style="margin-bottom:10px;">${c.ids.map(id=>`<span class="id-chip">${id}</span>`).join("")}</div>` : ""}
+        <div class="findings">
+          ${c.findings.map(f=>`
+            <div class="finding finding-${f.type}">
+              <div class="fi">${f.type==="ok"?"✓":f.type==="err"?"✗":f.type==="warn"?"⚠":"ℹ"}</div>
+              <div class="ft">${f.msg}${f.detail?`<div class="fc">${f.detail}</div>`:""}</div>
+            </div>`).join("")}
+        </div>
+      </div>`;
+    }).join("")}
+    <div style="margin-top:12px;display:flex;gap:8px;">
+      <button class="btn-ghost btn-sm" onclick="copyReport()">📋 Copiar Relatório</button>
+      <button class="btn-ghost btn-sm" onclick="printReport()">📄 PDF</button>
+    </div>`;
+
+  const el = document.getElementById("results");
+  el.innerHTML = html;
+  el.classList.remove("hidden");
+
+  // Store for copy/print
+  window._auditChecks = checks;
+  window._auditUrl = url;
+}
+
+function renderSuggestions(sug) {
+  if (!sug.length) return;
+  document.getElementById("suggestions-list").innerHTML = sug.map(s=>`
+    <div class="sug-item fade">
+      <div class="sug-icon">${s.icon}</div>
+      <div class="sug-body">
+        <div class="sug-title">${s.title}</div>
+        <div class="sug-desc">${s.desc}</div>
+        <div class="sug-action">→ ${s.action}</div>
+      </div>
+    </div>`).join("");
+  document.getElementById("suggestions-wrap").classList.remove("hidden");
+}
+
+// ── COPY / PRINT ──────────────────────────────────────────────────────────
+function copyReport() {
+  if (!window._auditChecks) return;
+  const statusMap = { ok:"✓ OK", warn:"⚠ Alerta", err:"✗ Crítico", na:"N/A" };
+  const lines = [`TRACKING AUDIT — ${window._auditUrl}`, `Data: ${new Date().toLocaleString("pt-BR")}`, ""];
+  window._auditChecks.forEach(c=>{
+    lines.push(`${c.icon} ${c.name} — ${statusMap[c.status]||"—"}`);
+    c.findings.forEach(f=> lines.push(`   ${f.type==="ok"?"✓":f.type==="err"?"✗":"⚠"} ${f.msg}${f.detail?" ("+f.detail+")":""}`));
+    lines.push("");
+  });
+  navigator.clipboard.writeText(lines.join("\n"));
+  alert("Relatório copiado!");
+}
+
+function printReport() {
+  if (!window._auditChecks) return;
+  const statusMap = { ok:"✓ OK", warn:"⚠ Alerta", err:"✗ Crítico", na:"N/A" };
+  const body = window._auditChecks.map(c=>`
+    <section>
+      <h2>${c.icon} ${c.name} — <span style="color:${c.status==="ok"?"#2d7a4f":c.status==="err"?"#c0392b":"#c07a1a"}">${statusMap[c.status]||"—"}</span></h2>
+      <ul>${c.findings.map(f=>`<li style="color:${f.type==="ok"?"#2d7a4f":f.type==="err"?"#c0392b":f.type==="warn"?"#c07a1a":"#555"}">${f.msg}${f.detail?`<br><small>${f.detail}</small>`:""}</li>`).join("")}</ul>
+    </section>`).join("");
+  const w = window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Tracking Audit — ${window._auditUrl}</title>
+  <style>body{font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:40px;color:#111}
+  h1{font-size:20px;border-bottom:2px solid #d4956a;padding-bottom:8px}
+  h2{font-size:13px;margin-top:22px;text-transform:uppercase;letter-spacing:.06em}
+  ul{margin:8px 0 0 16px;line-height:1.75;font-size:12.5px}
+  small{color:#888;font-size:11px}section{page-break-inside:avoid}.sub{color:#888;font-size:11px}</style></head>
+  <body><h1>Tracking Audit</h1><p class="sub">${window._auditUrl} · ${new Date().toLocaleString("pt-BR")}</p>${body}</body></html>`);
+  w.document.close(); w.print();
+}
+</script>
+</body>
+</html>

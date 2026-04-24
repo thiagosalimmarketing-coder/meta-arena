@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VÓRTEX · UTM Tracker</title>
+<style>
+  :root{--bg:#090909;--surf:#0f0f0f;--surf2:#111;--brd:#1c1c1c;--brd2:#222;--txt:#ebe7e1;--dim:#555;--dim2:#333;--acc:#d4956a;--green:#5bad85;--red:#e07070;--purple:#9b7dbf;--blue:#6a8eb5;--yellow:#d4c06a;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:Georgia,serif;font-size:14px;min-height:100vh}
+  input,select,textarea{background:var(--surf);border:1px solid var(--brd);color:var(--txt);padding:9px 13px;border-radius:7px;font-size:13px;outline:none;font-family:monospace;transition:border-color .15s;width:100%}
+  input:focus,select:focus{border-color:var(--acc)}
+  button{cursor:pointer;font-family:Georgia,serif;font-weight:600;border:none;border-radius:6px;transition:all .15s;font-size:12.5px}
+  button:hover:not(:disabled){opacity:.82}
+  ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+  select option{background:#111}
+
+  #nav{border-bottom:1px solid var(--brd);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .nav-sub{font-size:10px;letter-spacing:.35em;color:#282828;text-transform:uppercase;margin-bottom:2px}
+  .nav-title{font-size:17px;font-weight:400}
+
+  #main{max-width:960px;margin:0 auto;padding:24px 18px}
+
+  .tabs{display:flex;gap:3px;border-bottom:1px solid var(--brd);margin-bottom:22px}
+  .tab{padding:9px 18px;border:none;background:transparent;color:var(--dim);font-family:monospace;font-size:12.5px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap}
+  .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+  .sec-title{font-size:10.5px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .sec-title span{color:var(--acc)}
+
+  .card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:18px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  @media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}}
+
+  .field label{display:block;font-size:10px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:5px}
+  .field{margin-bottom:12px}
+
+  .btn{padding:9px 18px}
+  .btn-primary{background:var(--acc);color:#080808}
+  .btn-ghost{background:transparent;border:1px solid var(--brd2);color:var(--dim)}
+  .btn-green{background:#5bad8518;border:1px solid #5bad8535;color:var(--green)}
+  .btn-sm{padding:5px 11px;font-size:11.5px}
+
+  /* UTM Result */
+  #utm-result{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:16px;margin-top:14px;font-family:monospace;font-size:12px;word-break:break-all;line-height:1.7;color:#c0bbb5;display:none}
+  #utm-result .base{color:var(--dim)}
+  #utm-result .params{color:var(--acc)}
+
+  /* Links table */
+  .links-table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .links-table th{padding:8px 12px;text-align:left;font-size:10px;letter-spacing:.15em;color:var(--dim2);text-transform:uppercase;font-weight:400;border-bottom:1px solid var(--brd)}
+  .links-table td{padding:9px 12px;border-bottom:1px solid #141414;vertical-align:middle}
+  .links-table tr:last-child td{border-bottom:none}
+  .links-table tr:hover td{background:#0d0d0d}
+
+  .tag{font-size:10px;padding:2px 7px;border-radius:3px;font-family:monospace;display:inline-block}
+  .tag-feed{background:#d4956a15;color:var(--acc)}
+  .tag-stories{background:#9b7dbf15;color:var(--purple)}
+  .tag-reels{background:#6a8eb515;color:var(--blue)}
+  .tag-search{background:#5bad8515;color:var(--green)}
+
+  /* Stats */
+  .stat-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:14px;text-align:center}
+  .stat-lbl{font-size:10px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:4px}
+  .stat-val{font-size:22px;font-family:monospace;font-weight:600}
+
+  /* Copy flash */
+  .copied{animation:flash .4s ease}
+  @keyframes flash{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .fade{animation:fadeIn .3s ease}
+  .hidden{display:none!important}
+
+  /* Progress bar */
+  .bar-track{height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden;margin-top:6px}
+  .bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <div>
+    <div class="nav-sub">VÓRTEX · INTELLIGENCE PLATFORM</div>
+    <div class="nav-title">📎 UTM Tracker</div>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <a href="/index.html" style="padding:6px 13px;border-radius:6px;background:transparent;border:1px solid var(--brd2);color:var(--dim);font-size:12px;font-family:monospace;text-decoration:none">← Dashboard</a>
+    <a href="/brain.html" style="padding:6px 13px;border-radius:6px;background:#5bad8515;border:1px solid #5bad8530;color:#5bad85;font-size:12px;font-family:monospace;text-decoration:none">◈ Brain</a>
+    <a href="/squads.html" style="padding:6px 13px;border-radius:6px;background:#9b7dbf15;border:1px solid #9b7dbf30;color:#9b7dbf;font-size:12px;font-family:monospace;text-decoration:none">⚡ Squads</a>
+  </div>
+</div>
+
+<div id="main">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('gerar')">🔗 Gerar UTM</button>
+    <button class="tab" onclick="showTab('links')">📋 Meus Links</button>
+    <button class="tab" onclick="showTab('analise')">📊 Análise</button>
+  </div>
+
+  <!-- ── GERAR UTM ─────────────────────────────────── -->
+  <div id="tab-gerar">
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start">
+      <div>
+        <div class="sec-title"><span>🔗</span> Construtor de URL com UTM</div>
+        <div class="card">
+          <div class="field">
+            <label>URL de destino *</label>
+            <input id="url" placeholder="https://seusite.com.br/pagina" oninput="buildUTM()"/>
+          </div>
+          <div class="grid2">
+            <div class="field">
+              <label>Fonte (utm_source) *</label>
+              <select id="source" onchange="buildUTM()">
+                <option value="meta">meta</option>
+                <option value="google">google</option>
+                <option value="tiktok">tiktok</option>
+                <option value="linkedin">linkedin</option>
+                <option value="email">email</option>
+                <option value="whatsapp">whatsapp</option>
+                <option value="organico">organico</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Mídia (utm_medium) *</label>
+              <select id="medium" onchange="buildUTM()">
+                <option value="cpc">cpc</option>
+                <option value="pago">pago</option>
+                <option value="social">social</option>
+                <option value="email">email</option>
+                <option value="organico">organico</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Campanha (utm_campaign) *</label>
+            <input id="campaign" placeholder="ex: arena-leads-q2-2025" oninput="buildUTM()"/>
+          </div>
+          <div class="grid2">
+            <div class="field">
+              <label>Conteúdo (utm_content) — anúncio</label>
+              <input id="content" placeholder="ex: AD01-reels-hook-jovem" oninput="buildUTM()"/>
+            </div>
+            <div class="field">
+              <label>Termo (utm_term) — público</label>
+              <input id="term" placeholder="ex: broad-25-45-sp" oninput="buildUTM()"/>
+            </div>
+          </div>
+
+          <!-- Nomeação automática -->
+          <div style="border-top:1px solid var(--brd);padding-top:14px;margin-top:4px">
+            <div class="sec-title" style="margin-bottom:10px"><span>⚡</span> Nomenclatura Automática (padrão)</div>
+            <div class="grid3">
+              <div class="field">
+                <label>Código do anúncio</label>
+                <input id="ad-num" placeholder="01" oninput="autoFill()"/>
+              </div>
+              <div class="field">
+                <label>Formato</label>
+                <select id="ad-fmt" onchange="autoFill()">
+                  <option value="REELS">REELS</option>
+                  <option value="FEED">FEED</option>
+                  <option value="STORIES">STORIES</option>
+                  <option value="CARROSSEL">CARROSSEL</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Versão</label>
+                <select id="ad-ver" onchange="autoFill()">
+                  <option value="V1">V1</option>
+                  <option value="V2">V2</option>
+                  <option value="V3">V3</option>
+                  <option value="V4">V4</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Descrição do hook</label>
+              <input id="ad-hook" placeholder="ex: Depoimento-Junior, Mostrando-Tela, No-Cafe" oninput="autoFill()"/>
+            </div>
+          </div>
+
+          <!-- Resultado -->
+          <div id="utm-result">
+            <div class="base" id="url-base"></div><span class="params" id="url-params"></span>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="copyUTM()" id="btn-copy" style="flex:1;padding:11px">📋 Copiar Link</button>
+            <button class="btn btn-green" onclick="saveLink()" style="padding:11px 16px">💾 Salvar</button>
+            <button class="btn btn-ghost" onclick="clearForm()" style="padding:11px 14px">Limpar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview / Dica -->
+      <div>
+        <div class="sec-title"><span>💡</span> Padrão de Nomenclatura</div>
+        <div class="card" style="font-size:12px;font-family:monospace;line-height:2;color:#888">
+          <div style="color:var(--acc);margin-bottom:8px;font-size:11px;letter-spacing:.1em">UTM_CONTENT</div>
+          <div style="color:var(--txt)">AD<span style="color:var(--acc)">01</span>++[<span style="color:var(--blue)">REELS</span>]+[<span style="color:var(--green)">M</span>]++Depoimento++Junior++[V1]</div>
+          <div style="margin-top:12px;color:var(--dim)">
+            AD<span style="color:var(--acc)">##</span> = número do criativo<br>
+            [<span style="color:var(--blue)">FORMATO</span>] = REELS/FEED/STORIES<br>
+            [<span style="color:var(--green)">M/F</span>] = gênero do criativo<br>
+            Hook = descrição do gancho<br>
+            [V#] = versão do copy
+          </div>
+          <div style="margin-top:14px;border-top:1px solid var(--brd);padding-top:12px;color:var(--dim)">
+            <div style="color:var(--yellow);margin-bottom:6px">UTM_CAMPAIGN</div>
+            cliente-objetivo-periodo<br>
+            <span style="color:#555">arena-leads-q2-2025</span><br>
+            <span style="color:#555">nova-experimental-verao</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="sec-title" style="margin-bottom:10px"><span>📐</span> Templates rápidos</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button onclick="loadTemplate('meta-leads')" style="background:var(--surf2);border:1px solid var(--brd);color:var(--dim);padding:8px 12px;border-radius:6px;text-align:left;font-family:monospace;font-size:11.5px">Meta Ads → Lead Gen</button>
+            <button onclick="loadTemplate('meta-conversao')" style="background:var(--surf2);border:1px solid var(--brd);color:var(--dim);padding:8px 12px;border-radius:6px;text-align:left;font-family:monospace;font-size:11.5px">Meta Ads → Conversão</button>
+            <button onclick="loadTemplate('google-search')" style="background:var(--surf2);border:1px solid var(--brd);color:var(--dim);padding:8px 12px;border-radius:6px;text-align:left;font-family:monospace;font-size:11.5px">Google Ads → Search</button>
+            <button onclick="loadTemplate('email')" style="background:var(--surf2);border:1px solid var(--brd);color:var(--dim);padding:8px 12px;border-radius:6px;text-align:left;font-family:monospace;font-size:11.5px">E-mail Marketing</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MEUS LINKS ────────────────────────────────── -->
+  <div id="tab-links" class="hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+      <div class="sec-title" style="margin:0"><span>📋</span> Links Salvos (<span id="links-count">0</span>)</div>
+      <div style="display:flex;gap:6px">
+        <input id="search-links" placeholder="Buscar..." style="width:200px;font-size:12px;padding:7px 11px" oninput="renderLinks()"/>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearAllLinks()" style="color:var(--red)">Limpar tudo</button>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table class="links-table">
+        <thead><tr>
+          <th>Campanha</th><th>Conteúdo (Anúncio)</th><th>Fonte</th><th>URL</th><th>Criado</th><th></th>
+        </tr></thead>
+        <tbody id="links-tbody"></tbody>
+      </table>
+    </div>
+    <div id="links-empty" class="hidden" style="text-align:center;padding:40px;color:var(--dim2)">
+      <div style="font-size:28px;margin-bottom:8px">📎</div>
+      <div>Nenhum link salvo ainda.<br>Gere e salve links na aba Gerar UTM.</div>
+    </div>
+  </div>
+
+  <!-- ── ANÁLISE ────────────────────────────────────── -->
+  <div id="tab-analise" class="hidden">
+    <div class="sec-title"><span>📊</span> Análise por Criativo</div>
+    <div style="background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:20px;margin-bottom:18px">
+      <div style="font-size:13px;color:var(--dim);line-height:1.7;margin-bottom:14px">
+        Cole abaixo os dados de origem de sessão do seu GA4 ou Google Analytics filtrado por utm_content para ver qual anúncio performa melhor.
+      </div>
+      <div class="field">
+        <label>Dados CSV (cole do GA4 — utm_content, sessões, conversões)</label>
+        <textarea id="ga4-input" rows="6" style="font-family:monospace;font-size:12px" placeholder="utm_content,sessoes,conversoes&#10;AD01++[REELS]+[M]++Depoimento++[V1],245,12&#10;AD02++[FEED]+[F]++Produto++[V1],189,8&#10;AD03++[REELS]+[M]++Hook-Direto++[V2],312,22"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="analyzeGA4()" style="padding:10px 20px">📊 Analisar</button>
+    </div>
+
+    <div id="analysis-result" class="hidden fade">
+      <div class="grid3" id="analysis-stats" style="margin-bottom:16px"></div>
+      <div class="card">
+        <div class="sec-title" style="margin-bottom:12px"><span>📊</span> Performance por Anúncio</div>
+        <div id="analysis-bars"></div>
+      </div>
+    </div>
+
+    <!-- Manual tracking helper -->
+    <div class="card" style="margin-top:16px">
+      <div class="sec-title" style="margin-bottom:10px"><span>💡</span> Como rastrear sem GA4</div>
+      <div style="font-size:12.5px;color:#888;line-height:1.8;font-family:monospace">
+        <div style="color:var(--acc);margin-bottom:6px"># No Meta Ads Manager:</div>
+        Coluna "Conteúdo do anúncio manual da sessão"<br>
+        = valor do utm_content que você definiu<br><br>
+        <div style="color:var(--acc);margin-bottom:6px"># Filtrar relatório:</div>
+        Nível: Anúncio → Breakdowns → Dinâmica de anúncio<br>
+        + Adicionar coluna: "Conteúdo do anúncio manual"<br><br>
+        <div style="color:var(--green)">→ Você vê qual criativo gerou mais sessões qualificadas</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const LS = "vortex-utm-v1";
+function load() { try { return JSON.parse(localStorage.getItem(LS)||"[]"); } catch { return []; } }
+function save(d) { localStorage.setItem(LS, JSON.stringify(d)); }
+
+let links = load();
+
+function showTab(t) {
+  ["gerar","links","analise"].forEach(id => document.getElementById(`tab-${id}`).classList.toggle("hidden", id!==t));
+  document.querySelectorAll(".tab").forEach((el,i) => el.classList.toggle("active", ["gerar","links","analise"][i]===t));
+  if (t==="links") renderLinks();
+}
+
+function buildUTM() {
+  const url = document.getElementById("url").value.trim();
+  const source = document.getElementById("source").value;
+  const medium = document.getElementById("medium").value;
+  const campaign = document.getElementById("campaign").value.trim();
+  const content = document.getElementById("content").value.trim();
+  const term = document.getElementById("term").value.trim();
+
+  if (!url || !source || !campaign) {
+    document.getElementById("utm-result").style.display = "none";
+    return;
+  }
+
+  const params = new URLSearchParams();
+  params.set("utm_source", source);
+  params.set("utm_medium", medium);
+  if (campaign) params.set("utm_campaign", campaign);
+  if (content)  params.set("utm_content", content);
+  if (term)     params.set("utm_term", term);
+
+  document.getElementById("url-base").textContent = url + "?";
+  document.getElementById("url-params").textContent = params.toString();
+  document.getElementById("utm-result").style.display = "block";
+}
+
+function autoFill() {
+  const num = document.getElementById("ad-num").value || "01";
+  const fmt = document.getElementById("ad-fmt").value;
+  const ver = document.getElementById("ad-ver").value;
+  const hook = document.getElementById("ad-hook").value.replace(/\s+/g,"-");
+  const content = `AD${num.padStart(2,"0")}++[${fmt}]+[M]++${hook}++[${ver}]`;
+  document.getElementById("content").value = content;
+  buildUTM();
+}
+
+function getFullURL() {
+  const url = document.getElementById("url").value.trim();
+  const source = document.getElementById("source").value;
+  const medium = document.getElementById("medium").value;
+  const campaign = document.getElementById("campaign").value.trim();
+  const content = document.getElementById("content").value.trim();
+  const term = document.getElementById("term").value.trim();
+  if (!url || !campaign) return "";
+  const params = new URLSearchParams();
+  params.set("utm_source",source); params.set("utm_medium",medium);
+  if (campaign) params.set("utm_campaign",campaign);
+  if (content)  params.set("utm_content",content);
+  if (term)     params.set("utm_term",term);
+  return url+"?"+params.toString();
+}
+
+function copyUTM() {
+  const full = getFullURL();
+  if (!full) return;
+  navigator.clipboard.writeText(full);
+  const btn = document.getElementById("btn-copy");
+  btn.textContent = "✓ Copiado!";
+  btn.style.background = "#5bad85";
+  btn.style.color = "#080808";
+  setTimeout(()=>{ btn.textContent="📋 Copiar Link"; btn.style.background=""; btn.style.color=""; }, 2000);
+}
+
+function saveLink() {
+  const full = getFullURL();
+  if (!full) { alert("Preencha URL e campanha antes de salvar."); return; }
+  links.unshift({
+    id: Date.now(),
+    campaign: document.getElementById("campaign").value,
+    content: document.getElementById("content").value,
+    source: document.getElementById("source").value,
+    medium: document.getElementById("medium").value,
+    url: full,
+    created: new Date().toLocaleDateString("pt-BR")
+  });
+  save(links);
+  renderLinks();
+  const btn = document.querySelector(".btn-green");
+  btn.textContent = "✓ Salvo!";
+  setTimeout(()=>btn.textContent="💾 Salvar", 1500);
+}
+
+function clearForm() {
+  ["url","campaign","content","term","ad-num","ad-hook"].forEach(id => document.getElementById(id).value="");
+  document.getElementById("utm-result").style.display="none";
+}
+
+function loadTemplate(t) {
+  const tpls = {
+    "meta-leads":   { source:"meta", medium:"cpc", campaign:"cliente-leads-2025" },
+    "meta-conversao":{ source:"meta", medium:"cpc", campaign:"cliente-conversao-2025" },
+    "google-search":{ source:"google", medium:"cpc", campaign:"cliente-search-brand" },
+    "email":        { source:"email", medium:"email", campaign:"newsletter-maio-2025" },
+  };
+  const t2 = tpls[t];
+  if (!t2) return;
+  document.getElementById("source").value = t2.source;
+  document.getElementById("medium").value = t2.medium;
+  document.getElementById("campaign").value = t2.campaign;
+  buildUTM();
+}
+
+function renderLinks() {
+  const q = (document.getElementById("search-links")?.value||"").toLowerCase();
+  const filtered = links.filter(l => !q || l.campaign?.toLowerCase().includes(q) || l.content?.toLowerCase().includes(q));
+  document.getElementById("links-count").textContent = links.length;
+
+  const fmt = { meta:"tag-feed", google:"tag-search", tiktok:"tag-reels", linkedin:"tag-stories" };
+  if (!filtered.length) {
+    document.getElementById("links-empty").classList.remove("hidden");
+    document.getElementById("links-tbody").innerHTML = "";
+    return;
+  }
+  document.getElementById("links-empty").classList.add("hidden");
+  document.getElementById("links-tbody").innerHTML = filtered.map(l => `
+    <tr class="fade">
+      <td style="font-size:12.5px;font-family:monospace;color:var(--acc)">${l.campaign||"—"}</td>
+      <td style="font-size:11.5px;font-family:monospace;color:#888;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${l.content}">${l.content||"—"}</td>
+      <td><span class="tag ${fmt[l.source]||"tag-feed"}">${l.source}</span></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        <a href="${l.url}" target="_blank" style="color:var(--blue);font-size:11.5px;font-family:monospace;text-decoration:none" title="${l.url}">${new URL(l.url).hostname}...</a>
+      </td>
+      <td style="font-size:11px;color:var(--dim);font-family:monospace">${l.created}</td>
+      <td style="display:flex;gap:5px">
+        <button class="btn btn-sm" onclick="copyLink('${l.id}')" style="background:transparent;border:1px solid var(--brd);color:var(--dim)">📋</button>
+        <button class="btn btn-sm" onclick="deleteLink(${l.id})" style="background:transparent;border:1px solid var(--brd);color:var(--red)">✕</button>
+      </td>
+    </tr>`).join("");
+}
+
+function copyLink(id) {
+  const l = links.find(x => x.id == id);
+  if (l) { navigator.clipboard.writeText(l.url); }
+}
+
+function deleteLink(id) {
+  links = links.filter(l => l.id !== id);
+  save(links); renderLinks();
+}
+
+function clearAllLinks() {
+  if (!confirm("Remover todos os links salvos?")) return;
+  links = []; save(links); renderLinks();
+}
+
+function exportCSV() {
+  const header = "campaign,content,source,medium,url,created";
+  const rows = links.map(l => `"${l.campaign}","${l.content}","${l.source}","${l.medium}","${l.url}","${l.created}"`);
+  const blob = new Blob([[header,...rows].join("\n")], { type:"text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "vortex-utm-links.csv";
+  a.click();
+}
+
+function analyzeGA4() {
+  const raw = document.getElementById("ga4-input").value.trim();
+  if (!raw) return;
+  const lines = raw.split("\n").slice(1).filter(l=>l.trim());
+  const data = lines.map(l => {
+    const parts = l.split(",");
+    return { name:parts[0]?.trim(), sessions:parseInt(parts[1])||0, conv:parseInt(parts[2])||0 };
+  }).filter(d=>d.name && d.sessions > 0);
+
+  if (!data.length) { alert("Formato inválido. Use: utm_content,sessoes,conversoes"); return; }
+
+  const totalSess = data.reduce((s,d)=>s+d.sessions,0);
+  const totalConv = data.reduce((s,d)=>s+d.conv,0);
+  const best = data.reduce((a,b)=>((b.conv/b.sessions)>(a.conv/a.sessions)?b:a));
+  const maxSess = Math.max(...data.map(d=>d.sessions));
+
+  document.getElementById("analysis-stats").innerHTML = [
+    ["Total de Sessões", totalSess.toLocaleString("pt-BR"), "#6a8eb5"],
+    ["Total de Conversões", totalConv.toLocaleString("pt-BR"), "#5bad85"],
+    ["Melhor Criativo", best.name.slice(0,20)+"...", "#d4956a"],
+  ].map(([l,v,c])=>`<div class="stat-card"><div class="stat-lbl">${l}</div><div class="stat-val" style="color:${c};font-size:16px">${v}</div></div>`).join("");
+
+  data.sort((a,b)=>(b.conv/b.sessions)-(a.conv/a.sessions));
+  document.getElementById("analysis-bars").innerHTML = data.map((d,i)=>{
+    const cr = d.sessions>0?((d.conv/d.sessions)*100).toFixed(1):0;
+    const pct = Math.round((d.sessions/maxSess)*100);
+    const col = i===0?"#5bad85":i===1?"#d4956a":"#555";
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:11.5px;font-family:monospace;color:${col}">${d.name}</span>
+        <span style="font-size:11px;font-family:monospace;color:var(--dim)">${d.sessions} sess · ${d.conv} conv · <strong style="color:${col}">${cr}% CR</strong></span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("analysis-result").classList.remove("hidden");
+}
+
+renderLinks();
+</script>
+</body>
+</html>

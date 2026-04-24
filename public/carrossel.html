@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VÓRTEX · Carrossel</title>
+<style>
+  :root{
+    --bg:#090909;--surf:#0f0f0f;--surf2:#111;--surf3:#141414;
+    --brd:#1c1c1c;--brd2:#242424;
+    --txt:#ebe7e1;--dim:#555;--dim2:#333;
+    --acc:#d4956a;--green:#5bad85;--red:#e07070;
+    --purple:#9b7dbf;--vortex:#b57dbf;--blue:#6a8eb5;--yellow:#d4c06a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:Georgia,serif;font-size:14px;min-height:100vh}
+  input,select,textarea{background:var(--surf);border:1px solid var(--brd);color:var(--txt);
+    padding:8px 12px;border-radius:6px;font-size:13px;outline:none;font-family:Georgia,serif;
+    transition:border-color .15s;width:100%}
+  input:focus,select:focus,textarea:focus{border-color:var(--acc)}
+  button{cursor:pointer;font-family:Georgia,serif;font-weight:600;border:none;border-radius:6px;transition:all .15s}
+  button:hover:not(:disabled){opacity:.82}
+  button:disabled{opacity:.35;cursor:not-allowed}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+  select option{background:#111;color:var(--txt)}
+  textarea{resize:none;line-height:1.65}
+
+  /* NAV */
+  #nav{border-bottom:1px solid var(--brd);padding:12px 22px;display:flex;
+    align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .nav-sub{font-size:10px;letter-spacing:.35em;color:#282828;text-transform:uppercase;margin-bottom:2px}
+  .nav-title{font-size:17px;font-weight:400}
+
+  /* LAYOUT */
+  #layout{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 52px)}
+  @media(max-width:860px){#layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+
+  /* SIDEBAR */
+  #sidebar{border-right:1px solid var(--brd);padding:20px;overflow-y:auto;max-height:calc(100vh - 52px)}
+  .sec{margin-bottom:22px}
+  .sec-title{font-size:10px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+  .sec-title span{color:var(--acc)}
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:10px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:5px}
+
+  /* SLIDE LIST */
+  #slide-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .slide-item{background:var(--surf2);border:1px solid var(--brd);border-radius:7px;
+    padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s}
+  .slide-item:hover{border-color:var(--brd2)}
+  .slide-item.active{border-color:var(--acc);background:#d4956a0a}
+  .slide-num{font-size:10px;font-family:monospace;color:var(--dim);width:18px;flex-shrink:0;text-align:center}
+  .slide-preview-text{font-size:12px;color:var(--txt);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .slide-del{font-size:13px;color:var(--dim);padding:2px 5px;border-radius:4px;background:transparent;border:none;cursor:pointer;flex-shrink:0}
+  .slide-del:hover{color:var(--red)}
+
+  /* BUTTONS */
+  .btn{padding:8px 16px;font-size:12.5px}
+  .btn-primary{background:var(--acc);color:#080808}
+  .btn-ghost{background:transparent;border:1px solid var(--brd2);color:var(--dim)}
+  .btn-purple{background:#9b7dbf15;border:1px solid #9b7dbf35;color:var(--purple)}
+  .btn-green{background:#5bad8518;border:1px solid #5bad8535;color:var(--green)}
+  .btn-sm{padding:5px 11px;font-size:11.5px}
+  .btn-row{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* COLOR PALETTE */
+  .palette{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .color-swatch{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+  .color-swatch.active{border-color:var(--txt);transform:scale(1.1)}
+  .color-swatch:hover{transform:scale(1.05)}
+
+  /* CANVAS AREA */
+  #canvas-area{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    padding:28px 24px;background:var(--bg);overflow-y:auto;gap:24px}
+
+  /* CAROUSEL PREVIEW */
+  #preview-wrap{display:flex;flex-direction:column;align-items:center;gap:16px}
+  .preview-label{font-size:10px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+
+  /* SLIDE CANVAS */
+  .slide-canvas{position:relative;overflow:hidden;flex-shrink:0;border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6)}
+
+  /* FORMAT TOGGLE */
+  .fmt-pills{display:flex;gap:4px}
+  .fmt-pill{padding:5px 13px;border-radius:20px;font-size:11.5px;font-family:monospace;
+    cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--dim);transition:all .15s}
+  .fmt-pill.active{border-color:var(--acc);background:#d4956a15;color:var(--acc)}
+
+  /* SLIDE NAVIGATOR */
+  #slide-nav{display:flex;align-items:center;gap:12px}
+  .nav-btn{width:32px;height:32px;border-radius:50%;background:var(--surf2);border:1px solid var(--brd);color:var(--dim);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .nav-btn:hover:not(:disabled){background:var(--surf3);color:var(--txt)}
+  #nav-counter{font-family:monospace;font-size:12.5px;color:var(--dim)}
+
+  /* DOTS */
+  .dots{display:flex;gap:5px;justify-content:center}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--brd2);transition:all .2s;cursor:pointer}
+  .dot.active{background:var(--acc);width:18px;border-radius:3px}
+
+  /* AI PANEL */
+  #ai-panel{width:100%;max-width:600px}
+  .ai-box{background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:18px}
+  .ai-result-text{font-size:13px;line-height:1.8;color:#c0bbb5;white-space:pre-wrap;font-family:Georgia,serif}
+
+  /* LOADING */
+  .loading{color:var(--yellow);font-family:monospace;font-size:12.5px;animation:pulse 1.5s infinite}
+
+  /* RANGE */
+  input[type=range]{padding:0;height:4px;accent-color:var(--acc);cursor:pointer}
+
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .fade{animation:fadeIn .3s ease}
+  .hidden{display:none!important}
+
+  /* ALIGN PILLS */
+  .align-pills{display:flex;gap:4px}
+  .align-pill{padding:5px 10px;border-radius:5px;font-size:13px;cursor:pointer;
+    border:1px solid var(--brd);background:transparent;color:var(--dim);transition:all .15s}
+  .align-pill.active{border-color:var(--acc);color:var(--acc);background:#d4956a12}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div id="nav">
+  <div style="cursor:pointer" onclick="location.href='/index.html'">
+    <div class="nav-sub">VÓRTEX · INTELLIGENCE PLATFORM</div>
+    <div class="nav-title">🎠 VÓRTEX · Carrossel</div>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+    <a href="/index.html" style="padding:6px 13px;border-radius:6px;background:transparent;border:1px solid var(--brd2);color:var(--dim);font-size:12px;font-family:monospace;text-decoration:none">← Dashboard</a>
+    <a href="/brain.html" style="padding:6px 13px;border-radius:6px;background:#5bad8515;border:1px solid #5bad8530;color:#5bad85;font-size:12px;font-family:monospace;text-decoration:none">◈ Brain</a>
+    <button class="btn btn-green btn-sm" onclick="generateWithAI()">⚡ Gerar com IA</button>
+    <button class="btn btn-primary btn-sm" onclick="exportAll()">⬇ Exportar Slides</button>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+
+    <!-- AI GENERATOR -->
+    <div class="sec">
+      <div class="sec-title"><span>⚡</span> Gerar Conteúdo com IA</div>
+      <div class="field">
+        <label>Tema / Assunto</label>
+        <textarea id="ai-topic" rows="3" placeholder="Ex: Por que sua campanha Meta Ads não converte (e o que fazer)"></textarea>
+      </div>
+      <div class="field">
+        <label>Cliente / Contexto</label>
+        <select id="ai-client">
+          <option value="Arena Publicidade">Arena Publicidade (B2B)</option>
+          <option value="Nova Beach">Nova Beach (Beach Tennis)</option>
+          <option value="Geral">Conteúdo Geral de Marketing</option>
+          <option value="livre">Livre (sem persona)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Número de slides</label>
+        <select id="ai-slides">
+          <option value="5">5 slides</option>
+          <option value="7" selected>7 slides</option>
+          <option value="10">10 slides</option>
+          <option value="12">12 slides</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tom</label>
+        <select id="ai-tone">
+          <option value="educativo e direto">Educativo e direto</option>
+          <option value="provocativo e polêmico">Provocativo e polêmico</option>
+          <option value="consultivo e estratégico">Consultivo e estratégico</option>
+          <option value="motivacional">Motivacional</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" style="width:100%;padding:11px" onclick="generateWithAI()" id="btn-gen">⚡ Gerar Slides com IA</button>
+      <div id="ai-status" class="hidden" style="margin-top:10px;font-size:12px;color:var(--yellow);font-family:monospace"></div>
+    </div>
+
+    <!-- SLIDES LIST -->
+    <div class="sec">
+      <div class="sec-title"><span>📋</span> Slides <span style="color:var(--dim);letter-spacing:0" id="slide-count"></span></div>
+      <div id="slide-list"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="addSlide()" style="flex:1">+ Novo Slide</button>
+        <button class="btn btn-ghost btn-sm" onclick="duplicateSlide()">⎘ Duplicar</button>
+      </div>
+    </div>
+
+    <!-- SLIDE EDITOR -->
+    <div class="sec" id="editor-sec">
+      <div class="sec-title"><span>✎</span> Editar Slide <span id="editing-num" style="color:var(--dim);letter-spacing:0"></span></div>
+
+      <div class="field">
+        <label>Título</label>
+        <textarea id="ed-title" rows="2" oninput="updateCurrent()" placeholder="Título impactante..."></textarea>
+      </div>
+      <div class="field">
+        <label>Subtítulo / Corpo</label>
+        <textarea id="ed-body" rows="4" oninput="updateCurrent()" placeholder="Desenvolvimento, dados, explicação..."></textarea>
+      </div>
+      <div class="field">
+        <label>CTA / Rodapé</label>
+        <input id="ed-cta" type="text" oninput="updateCurrent()" placeholder="Ex: Salva para não esquecer →"/>
+      </div>
+      <div class="field">
+        <label>Número do slide</label>
+        <input id="ed-badge" type="text" oninput="updateCurrent()" placeholder="Ex: 01/07"/>
+      </div>
+
+      <!-- Design -->
+      <div class="field" style="margin-top:14px">
+        <label>Fundo</label>
+        <div class="palette" id="bg-palette"></div>
+        <input type="color" id="bg-custom" title="Cor personalizada" style="width:32px;height:28px;padding:2px;margin-top:6px;border-radius:6px;cursor:pointer" oninput="setCustomColor('bg',this.value)"/>
+      </div>
+      <div class="field">
+        <label>Cor do texto</label>
+        <div class="palette" id="txt-palette"></div>
+      </div>
+      <div class="field">
+        <label>Cor de destaque</label>
+        <div class="palette" id="acc-palette"></div>
+      </div>
+      <div class="field">
+        <label>Alinhamento</label>
+        <div class="align-pills">
+          <button class="align-pill active" onclick="setAlign('left',this)">◀ Esq</button>
+          <button class="align-pill" onclick="setAlign('center',this)">▬ Centro</button>
+          <button class="align-pill" onclick="setAlign('right',this)">▶ Dir</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Tamanho do título: <span id="title-size-lbl">38</span>px</label>
+        <input type="range" id="title-size" min="18" max="72" value="38" oninput="updateCurrent();document.getElementById('title-size-lbl').textContent=this.value"/>
+      </div>
+      <div class="field">
+        <label>Estilo de layout</label>
+        <select id="ed-layout" onchange="updateCurrent()">
+          <option value="classic">Clássico (título + corpo)</option>
+          <option value="hook">Hook (só título, grande)</option>
+          <option value="stat">Destaque de dado / número</option>
+          <option value="quote">Citação / frase impactante</option>
+          <option value="cover">Capa (logo + subtítulo)</option>
+          <option value="list">Lista de tópicos</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- FORMAT -->
+    <div class="sec">
+      <div class="sec-title"><span>📐</span> Formato</div>
+      <div class="fmt-pills">
+        <button class="fmt-pill active" onclick="setFormat('square',this)">■ 1:1</button>
+        <button class="fmt-pill" onclick="setFormat('portrait',this)">▌4:5</button>
+        <button class="fmt-pill" onclick="setFormat('story',this)">▌9:16</button>
+      </div>
+      <div style="font-size:11px;color:var(--dim);margin-top:8px;font-family:monospace" id="fmt-info">1080 × 1080px</div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- CANVAS AREA -->
+  <div id="canvas-area">
+
+    <!-- Navigator -->
+    <div id="slide-nav" class="fade">
+      <button class="nav-btn" id="btn-prev" onclick="goTo(currentSlide-1)">‹</button>
+      <div id="nav-counter">1 / 1</div>
+      <button class="nav-btn" id="btn-next" onclick="goTo(currentSlide+1)">›</button>
+    </div>
+
+    <!-- Canvas -->
+    <div id="preview-wrap">
+      <div class="preview-label" id="prev-label">SLIDE 1 — PRÉVIA</div>
+      <div id="slide-canvas" class="slide-canvas"></div>
+      <div class="dots" id="dots-row"></div>
+    </div>
+
+    <!-- Export info -->
+    <div style="text-align:center;font-size:11.5px;color:var(--dim);font-family:monospace;line-height:1.7">
+      ⬇ Clique em <strong style="color:var(--txt)">Exportar Slides</strong> para baixar cada slide como imagem PNG<br>
+      Ou use <strong style="color:var(--txt)">Print → Salvar como PDF</strong> para o pacote completo
+    </div>
+
+  </div><!-- /canvas-area -->
+
+</div><!-- /layout -->
+
+<!-- EXPORT MODAL -->
+<div id="export-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px">
+  <div style="background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:24px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div style="font-size:15px;font-weight:400">⬇ Exportar Carrossel</div>
+      <button onclick="document.getElementById('export-modal').classList.add('hidden')" style="background:transparent;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div id="export-slides-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:18px"></div>
+    <div style="font-size:11.5px;color:var(--dim);line-height:1.7;margin-bottom:14px;font-family:monospace">
+      Clique com botão direito em cada slide → "Salvar imagem como" para baixar individualmente.
+      Ou use Ctrl+P para imprimir/salvar como PDF com todos os slides.
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="window.print()" style="flex:1">🖨 Imprimir / PDF</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('export-modal').classList.add('hidden')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────
+const FORMATS = {
+  square:  { w:520, h:520, label:"1080 × 1080px" },
+  portrait:{ w:520, h:650, label:"1080 × 1350px" },
+  story:   { w:390, h:693, label:"1080 × 1920px" },
+};
+
+const BG_COLORS = [
+  "#090909","#0f0f0f","#1a1a1a","#0a0f1e","#0d1117",
+  "#1a0a0a","#0a1a0a","#1a0d1a","#fffdf8","#f5f0e8",
+  "#1a1208","#0a1520","#d4956a","#5bad85","#9b7dbf",
+];
+const TXT_COLORS = ["#ebe7e1","#ffffff","#f0e8d8","#090909","#1a1a1a","#d4956a","#5bad85","#9b7dbf","#6a8eb5"];
+const ACC_COLORS = ["#d4956a","#5bad85","#9b7dbf","#6a8eb5","#d4c06a","#e07070","#ffffff","#090909","#f5f0e8"];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let slides = [
+  { title:"Por que sua campanha não converte?", body:"A resposta não está no criativo.\nNem no público.\nNem no budget.", cta:"Deslize →", badge:"01/07",
+    bg:"#090909", txtColor:"#ebe7e1", accColor:"#d4956a", align:"left", titleSize:38, layout:"hook" },
+  { title:"O problema está nas 9 camadas", body:"A maioria dos gestores olha só para CTR e ROAS.\nMas a performance é resultado de:\nEstratégia + Oferta + Público + Criativo + Funil + UX + Dados", cta:"Continue →", badge:"02/07",
+    bg:"#0a0f1e", txtColor:"#ebe7e1", accColor:"#6a8eb5", align:"left", titleSize:32, layout:"classic" },
+];
+let currentSlide = 0;
+let currentFormat = "square";
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+function init() {
+  buildPalettes();
+  renderSidebar();
+  renderCanvas();
+  loadEditor();
+}
+
+function buildPalettes() {
+  const build = (id, colors, type) => {
+    document.getElementById(id).innerHTML = colors.map((c,i) =>
+      `<div class="color-swatch" style="background:${c}" title="${c}" onclick="setColor('${type}','${c}',this)"></div>`
+    ).join("");
+  };
+  build("bg-palette", BG_COLORS, "bg");
+  build("txt-palette", TXT_COLORS, "txt");
+  build("acc-palette", ACC_COLORS, "acc");
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────────────────────
+function renderSidebar() {
+  document.getElementById("slide-count").textContent = `(${slides.length})`;
+  document.getElementById("slide-list").innerHTML = slides.map((s,i) =>
+    `<div class="slide-item ${i===currentSlide?"active":""}" onclick="goTo(${i})">
+      <span class="slide-num">${String(i+1).padStart(2,"0")}</span>
+      <span class="slide-preview-text">${s.title||"(sem título)"}</span>
+      <button class="slide-del" onclick="event.stopPropagation();deleteSlide(${i})" title="Remover">✕</button>
+    </div>`
+  ).join("");
+}
+
+// ── EDITOR ────────────────────────────────────────────────────────────────
+function loadEditor() {
+  const s = slides[currentSlide];
+  document.getElementById("ed-title").value   = s.title || "";
+  document.getElementById("ed-body").value    = s.body  || "";
+  document.getElementById("ed-cta").value     = s.cta   || "";
+  document.getElementById("ed-badge").value   = s.badge || "";
+  document.getElementById("ed-layout").value  = s.layout || "classic";
+  document.getElementById("title-size").value = s.titleSize || 38;
+  document.getElementById("title-size-lbl").textContent = s.titleSize || 38;
+  document.getElementById("editing-num").textContent = `#${currentSlide+1}`;
+
+  // Active align pill
+  document.querySelectorAll(".align-pill").forEach(el => {
+    el.classList.toggle("active", el.getAttribute("onclick").includes(`'${s.align||"left"}'`));
+  });
+}
+
+function updateCurrent() {
+  const s = slides[currentSlide];
+  s.title     = document.getElementById("ed-title").value;
+  s.body      = document.getElementById("ed-body").value;
+  s.cta       = document.getElementById("ed-cta").value;
+  s.badge     = document.getElementById("ed-badge").value;
+  s.layout    = document.getElementById("ed-layout").value;
+  s.titleSize = parseInt(document.getElementById("title-size").value);
+  renderCanvas();
+  renderSidebar();
+}
+
+function setColor(type, color, el) {
+  const s = slides[currentSlide];
+  if (type==="bg")  { s.bg       = color; document.querySelectorAll("#bg-palette  .color-swatch").forEach(x=>x.classList.remove("active")); }
+  if (type==="txt") { s.txtColor = color; document.querySelectorAll("#txt-palette .color-swatch").forEach(x=>x.classList.remove("active")); }
+  if (type==="acc") { s.accColor = color; document.querySelectorAll("#acc-palette .color-swatch").forEach(x=>x.classList.remove("active")); }
+  el.classList.add("active");
+  renderCanvas();
+}
+
+function setCustomColor(type, color) {
+  const s = slides[currentSlide];
+  if (type==="bg") s.bg = color;
+  renderCanvas();
+}
+
+function setAlign(align, el) {
+  slides[currentSlide].align = align;
+  document.querySelectorAll(".align-pill").forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
+  renderCanvas();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function goTo(i) {
+  if (i < 0 || i >= slides.length) return;
+  currentSlide = i;
+  loadEditor();
+  renderCanvas();
+  renderSidebar();
+}
+
+function addSlide() {
+  const prev = slides[currentSlide];
+  slides.push({
+    title:"Novo Slide", body:"", cta:"Continue →",
+    badge:`${String(slides.length+1).padStart(2,"0")}/${slides.length+1}`,
+    bg:prev.bg, txtColor:prev.txtColor, accColor:prev.accColor,
+    align:prev.align, titleSize:prev.titleSize, layout:"classic"
+  });
+  goTo(slides.length-1);
+}
+
+function duplicateSlide() {
+  slides.splice(currentSlide+1, 0, JSON.parse(JSON.stringify(slides[currentSlide])));
+  goTo(currentSlide+1);
+}
+
+function deleteSlide(i) {
+  if (slides.length <= 1) return;
+  slides.splice(i,1);
+  if (currentSlide >= slides.length) currentSlide = slides.length-1;
+  goTo(currentSlide);
+}
+
+// ── FORMAT ────────────────────────────────────────────────────────────────
+function setFormat(fmt, el) {
+  currentFormat = fmt;
+  document.querySelectorAll(".fmt-pill").forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("fmt-info").textContent = FORMATS[fmt].label;
+  renderCanvas();
+}
+
+// ── RENDER CANVAS ─────────────────────────────────────────────────────────
+function renderCanvas() {
+  const s = slides[currentSlide];
+  const f = FORMATS[currentFormat];
+  const canvas = document.getElementById("slide-canvas");
+  canvas.style.width  = f.w + "px";
+  canvas.style.height = f.h + "px";
+  canvas.style.background = s.bg;
+  canvas.innerHTML = buildSlideHTML(s, f.w, f.h);
+
+  // Nav
+  document.getElementById("nav-counter").textContent = `${currentSlide+1} / ${slides.length}`;
+  document.getElementById("btn-prev").disabled = currentSlide === 0;
+  document.getElementById("btn-next").disabled = currentSlide === slides.length-1;
+  document.getElementById("prev-label").textContent = `SLIDE ${currentSlide+1} — PRÉVIA`;
+
+  // Dots
+  document.getElementById("dots-row").innerHTML = slides.map((_,i) =>
+    `<div class="dot ${i===currentSlide?"active":""}" onclick="goTo(${i})"></div>`
+  ).join("");
+}
+
+function buildSlideHTML(s, w, h) {
+  const pad = Math.round(w * 0.08);
+  const align = s.align || "left";
+  const txtAlign = { left:"left", center:"center", right:"right" }[align];
+  const flexAlign = { left:"flex-start", center:"center", right:"flex-end" }[align];
+  const titleSize = s.titleSize || 38;
+  const bodySize  = Math.max(12, Math.round(titleSize * 0.42));
+  const ctaSize   = Math.max(10, Math.round(titleSize * 0.32));
+  const lineH = s.layout === "hook" ? 1.1 : 1.3;
+
+  let inner = "";
+
+  if (s.layout === "hook") {
+    inner = `
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:${flexAlign}">
+        <div style="font-size:${titleSize}px;font-weight:700;line-height:${lineH};color:${s.txtColor};text-align:${txtAlign};letter-spacing:-.02em;max-width:${w-pad*2}px">
+          ${esc(s.title).replace(/\n/g,"<br>")}
+        </div>
+        ${s.body?`<div style="margin-top:16px;font-size:${bodySize}px;color:${s.accColor};text-align:${txtAlign};line-height:1.5;max-width:${w-pad*2}px">${esc(s.body).replace(/\n/g,"<br>")}</div>`:""}
+      </div>`;
+  }
+  else if (s.layout === "stat") {
+    const parts = s.title.split("\n");
+    const stat  = parts[0] || "";
+    const rest  = parts.slice(1).join("\n");
+    inner = `
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:${flexAlign}">
+        <div style="font-size:${Math.round(titleSize*1.8)}px;font-weight:700;line-height:1;color:${s.accColor};font-family:monospace;text-align:${txtAlign}">${esc(stat)}</div>
+        ${rest?`<div style="margin-top:10px;font-size:${Math.round(titleSize*.55)}px;font-weight:600;color:${s.txtColor};text-align:${txtAlign};line-height:1.3">${esc(rest).replace(/\n/g,"<br>")}</div>`:""}
+        ${s.body?`<div style="margin-top:14px;font-size:${bodySize}px;color:${s.txtColor}99;text-align:${txtAlign};line-height:1.55;max-width:${w-pad*2}px">${esc(s.body).replace(/\n/g,"<br>")}</div>`:""}
+      </div>`;
+  }
+  else if (s.layout === "quote") {
+    inner = `
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:${flexAlign}">
+        <div style="font-size:${Math.round(titleSize*1.4)}px;color:${s.accColor};line-height:1;margin-bottom:12px;text-align:${txtAlign}">"</div>
+        <div style="font-size:${Math.round(titleSize*.75)}px;font-style:italic;line-height:1.35;color:${s.txtColor};text-align:${txtAlign};max-width:${w-pad*2}px">
+          ${esc(s.title).replace(/\n/g,"<br>")}
+        </div>
+        ${s.body?`<div style="margin-top:14px;font-size:${bodySize}px;color:${s.accColor};text-align:${txtAlign}">— ${esc(s.body)}</div>`:""}
+      </div>`;
+  }
+  else if (s.layout === "cover") {
+    inner = `
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:${flexAlign};gap:16px">
+        <div style="width:48px;height:4px;background:${s.accColor};border-radius:2px;${align==='center'?'margin:0 auto':''}"></div>
+        <div style="font-size:${titleSize}px;font-weight:700;line-height:1.15;color:${s.txtColor};text-align:${txtAlign};letter-spacing:-.01em;max-width:${w-pad*2}px">
+          ${esc(s.title).replace(/\n/g,"<br>")}
+        </div>
+        ${s.body?`<div style="font-size:${bodySize}px;color:${s.accColor};text-align:${txtAlign};line-height:1.5">${esc(s.body).replace(/\n/g,"<br>")}</div>`:""}
+        <div style="width:48px;height:4px;background:${s.accColor};border-radius:2px;opacity:.3;${align==='center'?'margin:0 auto':''}"></div>
+      </div>`;
+  }
+  else if (s.layout === "list") {
+    const items = s.body.split("\n").filter(l=>l.trim());
+    inner = `
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:${flexAlign};gap:14px">
+        <div style="font-size:${Math.round(titleSize*.7)}px;font-weight:700;color:${s.txtColor};text-align:${txtAlign};line-height:1.25;max-width:${w-pad*2}px;margin-bottom:4px">
+          ${esc(s.title).replace(/\n/g,"<br>")}
+        </div>
+        ${items.map((item,i)=>`
+          <div style="display:flex;align-items:flex-start;gap:10px;${align==='center'?'justify-content:center':''}">
+            <span style="color:${s.accColor};font-size:${bodySize}px;font-weight:700;flex-shrink:0;margin-top:1px">${String(i+1).padStart(2,"0")}.</span>
+            <span style="font-size:${bodySize}px;color:${s.txtColor};line-height:1.45">${esc(item)}</span>
+          </div>`).join("")}
+      </div>`;
+  }
+  else { // classic
+    inner = `
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:${flexAlign};gap:14px">
+        <div style="font-size:${titleSize}px;font-weight:700;line-height:${lineH};color:${s.txtColor};text-align:${txtAlign};letter-spacing:-.01em;max-width:${w-pad*2}px">
+          ${esc(s.title).replace(/\n/g,"<br>")}
+        </div>
+        ${s.body?`<div style="width:32px;height:3px;background:${s.accColor};border-radius:2px;${align==='center'?'margin:0 auto':''}"></div>
+        <div style="font-size:${bodySize}px;color:${s.txtColor}cc;text-align:${txtAlign};line-height:1.65;max-width:${w-pad*2}px">${esc(s.body).replace(/\n/g,"<br>")}</div>`:""}
+      </div>`;
+  }
+
+  return `
+    <div style="width:100%;height:100%;padding:${pad}px;display:flex;flex-direction:column;font-family:Georgia,serif;position:relative;overflow:hidden">
+      <!-- Top accent line -->
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,${s.accColor},${s.accColor}44)"></div>
+
+      <!-- Badge top -->
+      ${s.badge?`<div style="font-size:${ctaSize}px;font-family:monospace;color:${s.accColor};letter-spacing:.1em;margin-bottom:${Math.round(h*.025)}px;text-align:${txtAlign};width:100%">${esc(s.badge)}</div>`:""}
+
+      <!-- Content -->
+      ${inner}
+
+      <!-- CTA bottom -->
+      ${s.cta?`<div style="margin-top:${Math.round(h*.03)}px;font-size:${ctaSize+1}px;color:${s.accColor};font-weight:600;text-align:${txtAlign};letter-spacing:.03em;width:100%">${esc(s.cta)}</div>`:""}
+
+      <!-- Bottom corner decoration -->
+      <div style="position:absolute;bottom:${Math.round(h*.04)}px;${align==='right'?'left':'right'}:${pad}px;font-size:${ctaSize-2}px;font-family:monospace;color:${s.txtColor}22;letter-spacing:.08em">◈</div>
+    </div>`;
+}
+
+function esc(s) {
+  return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ── AI GENERATION ─────────────────────────────────────────────────────────
+async function generateWithAI() {
+  const topic  = document.getElementById("ai-topic").value.trim();
+  const client = document.getElementById("ai-client").value;
+  const nSlides= document.getElementById("ai-slides").value;
+  const tone   = document.getElementById("ai-tone").value;
+
+  if (!topic) { document.getElementById("ai-topic").focus(); return; }
+
+  const btn = document.getElementById("btn-gen");
+  btn.disabled = true; btn.textContent = "⏳ Gerando...";
+  const status = document.getElementById("ai-status");
+  status.classList.remove("hidden");
+  status.textContent = `Criando ${nSlides} slides sobre "${topic}"...`;
+
+  const clientCtx = {
+    "Arena Publicidade": "Público: gestores de marketing B2B, empresas 200+ funcionários. Tom: consultivo, profissional, ROI-focado.",
+    "Nova Beach": "Público: adultos 25-45 anos, classes A/B, interessados em beach tennis e lifestyle ativo em Campinas. Tom: energético, comunidade.",
+    "Geral": "Público geral de marketing digital, profissionais de tráfego pago.",
+    "livre": ""
+  }[client];
+
+  const system = `Você é um especialista em criação de conteúdo para Instagram no formato carrossel. Cria slides educativos, informativos e que engajam profissionais de marketing.
+
+REGRAS:
+- Primeiro slide: hook forte que pare o scroll (polêmico, curioso ou com dado)
+- Slides do meio: desenvolvimento com valor real, dados, exemplos
+- Último slide: CTA claro e convite à ação
+- Cada título: curto, impactante, máximo 8 palavras
+- Corpo: máximo 3-4 linhas, objetivo e direto
+- Badge: formato "01/0X" onde X = total de slides
+- Sem emojis no título (pode no CTA)
+- Layout: varie entre classic, hook, stat, quote, list, cover
+
+IMPORTANTE: Retorne SOMENTE um JSON válido, sem markdown, sem texto antes ou depois.`;
+
+  const user = `Crie ${nSlides} slides de carrossel sobre: "${topic}"
+${clientCtx ? `\nContexto do cliente: ${clientCtx}` : ""}
+Tom: ${tone}
+
+Retorne SOMENTE este JSON (sem markdown):
+[
+  {
+    "title": "título do slide",
+    "body": "corpo do slide\npode ter quebras de linha",
+    "cta": "texto do CTA",
+    "badge": "01/${nSlides.padStart?nSlides:nSlides}",
+    "layout": "hook|classic|stat|quote|list|cover",
+    "bg": "#090909",
+    "txtColor": "#ebe7e1",
+    "accColor": "#d4956a",
+    "align": "left|center",
+    "titleSize": 36
+  }
+]
+Varie as cores bg/accColor entre slides para criar ritmo visual. Use cores escuras (#090909, #0a0f1e, #0d1117) e de destaque (#d4956a, #5bad85, #9b7dbf, #6a8eb5) alternadas.`;
+
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:3000, system, messages:[{role:"user",content:user}] })
+    });
+    const d = await r.json();
+    const text = d.content?.[0]?.text || "";
+    const clean = text.replace(/```json|```/g,"").trim();
+    const parsed = JSON.parse(clean);
+
+    if (Array.isArray(parsed) && parsed.length) {
+      slides = parsed.map((s,i) => ({
+        title: s.title || "",
+        body: s.body || "",
+        cta: s.cta || "Continue →",
+        badge: s.badge || `${String(i+1).padStart(2,"0")}/${parsed.length}`,
+        bg: s.bg || "#090909",
+        txtColor: s.txtColor || "#ebe7e1",
+        accColor: s.accColor || "#d4956a",
+        align: s.align || "left",
+        titleSize: s.titleSize || 36,
+        layout: s.layout || "classic",
+      }));
+      currentSlide = 0;
+      goTo(0);
+      status.textContent = `✓ ${slides.length} slides criados com sucesso!`;
+      status.style.color = "#5bad85";
+    }
+  } catch(e) {
+    status.textContent = `Erro: ${e.message}`;
+    status.style.color = "#e07070";
+  }
+
+  btn.disabled = false; btn.textContent = "⚡ Gerar Slides com IA";
+  setTimeout(() => { status.classList.add("hidden"); status.style.color = "var(--yellow)"; }, 4000);
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────
+function exportAll() {
+  const modal = document.getElementById("export-modal");
+  const grid  = document.getElementById("export-slides-grid");
+  const f = FORMATS[currentFormat];
+
+  grid.innerHTML = slides.map((s,i) => {
+    const html = buildSlideHTML(s, f.w, f.h);
+    return `
+      <div style="cursor:pointer" title="Slide ${i+1}">
+        <div style="width:140px;height:${Math.round(140*f.h/f.w)}px;background:${s.bg};border-radius:8px;overflow:hidden;position:relative;border:1px solid #1c1c1c;font-size:${Math.round(140/f.w*s.titleSize)}px">
+          <div style="transform:scale(${140/f.w});transform-origin:top left;width:${f.w}px;height:${f.h}px">
+            ${html}
+          </div>
+        </div>
+        <div style="font-size:10px;font-family:monospace;color:#555;margin-top:5px;text-align:center">Slide ${i+1}</div>
+      </div>`;
+  }).join("");
+
+  modal.classList.remove("hidden");
+}
+
+// ── START ─────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

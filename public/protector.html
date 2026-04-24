@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VÓRTEX · Protector</title>
+<style>
+  :root {
+    --bg:#090909; --surf:#0f0f0f; --surf2:#111;
+    --brd:#1c1c1c; --brd2:#242424;
+    --txt:#ebe7e1; --dim:#555; --dim2:#333;
+    --acc:#d4956a; --green:#5bad85; --red:#e07070;
+    --yellow:#d4c06a; --blue:#6a8eb5; --purple:#9b7dbf;--vortex:#b57dbf;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:Georgia,serif;font-size:14px;min-height:100vh}
+  input,select,textarea{background:var(--surf);border:1px solid var(--brd);color:var(--txt);
+    padding:8px 12px;border-radius:6px;font-size:12.5px;outline:none;font-family:monospace;
+    transition:border-color .15s}
+  input:focus,select:focus{border-color:var(--acc)}
+  button{cursor:pointer;font-family:Georgia,serif;font-weight:600;border:none;border-radius:6px;transition:all .15s}
+  button:hover:not(:disabled){opacity:.82}
+  button:disabled{opacity:.35;cursor:not-allowed}
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+  select option{background:#111}
+
+  /* NAV */
+  #nav{border-bottom:1px solid var(--brd);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .nav-left .sub{font-size:10px;letter-spacing:.35em;color:#282828;text-transform:uppercase;margin-bottom:2px}
+  .nav-left .title{font-size:17px;font-weight:400}
+  .nav-links{display:flex;gap:4px}
+  .nav-link{padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-family:monospace;cursor:pointer;background:transparent;color:var(--dim);text-decoration:none;display:flex;align-items:center;transition:all .15s}
+  .nav-link:hover,.nav-link.active{background:#1a1a1a;color:var(--txt)}
+
+  /* MAIN */
+  #main{max-width:900px;margin:0 auto;padding:24px 20px}
+
+  /* STATUS BAR */
+  #status-bar{display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;background:var(--surf);border:1px solid var(--brd);
+    border-radius:8px;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+  #monitor-status{display:flex;align-items:center;gap:8px;font-size:13px}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--dim);flex-shrink:0}
+  .pulse.on{background:var(--green);box-shadow:0 0 8px #5bad8560;animation:blink 2s infinite}
+  .pulse.checking{background:var(--yellow);box-shadow:0 0 8px #d4c06a60;animation:blink .6s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* SECTION */
+  .section{margin-bottom:28px}
+  .section-title{font-size:10.5px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .section-title span{color:var(--acc)}
+
+  /* RULE CARD */
+  .rule-card{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:16px;margin-bottom:10px;position:relative}
+  .rule-card.active-rule{border-color:#5bad8535}
+  .rule-card.inactive-rule{opacity:.55}
+  .rule-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .rule-name{font-size:13.5px;color:var(--txt);flex:1}
+  .rule-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+  @media(max-width:600px){.rule-grid{grid-template-columns:1fr 1fr}}
+  .rule-field label{display:block;font-size:10px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:5px}
+  .rule-field input,.rule-field select{width:100%}
+  .rule-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+
+  /* ACTION TAG */
+  .action-tag{padding:3px 9px;border-radius:4px;font-size:11px;font-family:monospace;font-weight:600}
+  .action-PAUSE{background:#e0707018;border:1px solid #e0707040;color:#e07070}
+  .action-ACTIVATE{background:#5bad8518;border:1px solid #5bad8540;color:#5bad85}
+  .action-REDUCE{background:#d4956a18;border:1px solid #d4956a40;color:#d4956a}
+  .action-SCALE{background:#6a8eb518;border:1px solid #6a8eb540;color:#6a8eb5}
+  .action-ALERT{background:#9b7dbf18;border:1px solid #9b7dbf40;color:#9b7dbf}
+
+  /* CAMPAIGN STATUS TABLE */
+  #camps-table{width:100%;border-collapse:collapse}
+  #camps-table th{padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.15em;color:var(--dim2);text-transform:uppercase;font-weight:400;border-bottom:1px solid var(--brd)}
+  #camps-table td{padding:9px 10px;font-size:12.5px;border-bottom:1px solid #141414;vertical-align:middle}
+  #camps-table tr:last-child td{border-bottom:none}
+  .metric-chip{padding:3px 7px;border-radius:4px;font-size:11.5px;font-family:monospace}
+  .chip-ok{background:#5bad8512;color:#5bad85}
+  .chip-warn{background:#d4956a12;color:#d4956a}
+  .chip-bad{background:#e0707012;color:#e07070}
+  .chip-na{color:var(--dim);font-style:italic}
+
+  /* LOG */
+  #log-list{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto}
+  .log-entry{padding:10px 14px;background:var(--surf);border:1px solid var(--brd);border-radius:7px;display:flex;gap:12px;align-items:flex-start}
+  .log-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+  .log-body{flex:1;min-width:0}
+  .log-time{font-size:10.5px;color:var(--dim);font-family:monospace}
+  .log-msg{font-size:12.5px;color:var(--txt);margin-top:2px;line-height:1.4}
+  .log-detail{font-size:11px;color:var(--dim);margin-top:3px;font-family:monospace}
+
+  /* BUTTONS */
+  .btn-primary{padding:10px 20px;background:var(--acc);color:#080808;font-size:13px}
+  .btn-ghost{padding:9px 18px;background:transparent;border:1px solid var(--brd2);color:var(--dim);font-size:13px}
+  .btn-danger{padding:9px 18px;background:#e0707018;border:1px solid #e0707035;color:#e07070;font-size:13px}
+  .btn-green{padding:9px 18px;background:#5bad8518;border:1px solid #5bad8535;color:#5bad85;font-size:13px}
+  .btn-sm{padding:5px 11px;font-size:11.5px}
+
+  /* EMPTY STATE */
+  .empty{text-align:center;padding:40px 20px;color:var(--dim2)}
+  .empty .ico{font-size:28px;margin-bottom:8px}
+  .empty p{font-size:13px;color:var(--dim)}
+
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .fade{animation:fadeIn .3s ease}
+  .hidden{display:none!important}
+
+  /* TOGGLE */
+  .toggle{position:relative;width:34px;height:18px;flex-shrink:0}
+  .toggle input{opacity:0;width:0;height:0;position:absolute}
+  .toggle-slider{position:absolute;inset:0;background:#2a2a2a;border-radius:18px;cursor:pointer;transition:.2s}
+  .toggle-slider:before{content:"";position:absolute;width:12px;height:12px;left:3px;top:3px;background:#555;border-radius:50%;transition:.2s}
+  .toggle input:checked+.toggle-slider{background:#5bad8540;border:1px solid #5bad8560}
+  .toggle input:checked+.toggle-slider:before{transform:translateX(16px);background:#5bad85}
+
+  /* SAFE MODE */
+  #safe-bar{padding:10px 16px;background:#14120a;border:1px solid #3a2f0a;border-radius:7px;
+    margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:12px;color:#d4c06a}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <div class="nav-left">
+    <div class="sub">VÓRTEX · INTELLIGENCE PLATFORM</div>
+    <div class="title">🛡 VÓRTEX · Protector</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <a href="/index.html" class="nav-link">← Dashboard</a>
+    <select id="date-preset" style="font-size:12px;">
+      <option value="today">Hoje</option>
+      <option value="last_3d">Últimos 3 dias</option>
+      <option value="last_7d" selected>Últimos 7 dias</option>
+      <option value="last_14d">Últimos 14 dias</option>
+      <option value="last_30d">Últimos 30 dias</option>
+    </select>
+    <button class="btn-primary" onclick="runCheck()" id="btn-check">▶ Verificar Agora</button>
+  </div>
+</div>
+
+<div id="main">
+
+  <!-- STATUS BAR -->
+  <div id="status-bar">
+    <div id="monitor-status">
+      <div class="pulse" id="pulse-dot"></div>
+      <span id="status-txt" style="color:var(--dim);font-family:monospace;">Aguardando verificação</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--dim);">Modo seguro</span>
+      <label class="toggle"><input type="checkbox" id="safe-mode" checked onchange="toggleSafeMode()"><div class="toggle-slider"></div></label>
+      <span style="font-size:11px;color:var(--dim);">Auto a cada</span>
+      <select id="auto-interval" style="font-size:11px;padding:4px 8px;width:auto" onchange="setAutoRun()">
+        <option value="0">Desligado</option>
+        <option value="5">5 min</option>
+        <option value="15">15 min</option>
+        <option value="30">30 min</option>
+        <option value="60">1 hora</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="safe-bar">
+    ⚠️ <strong>Modo Seguro ativado</strong> — regras simulam ações mas não executam na conta real. Desative o Modo Seguro para aplicar mudanças.
+  </div>
+
+  <!-- RULES SECTION -->
+  <div class="section">
+    <div class="section-title"><span>⚡</span> Regras Ativas</div>
+    <div id="rules-list"></div>
+    <button class="btn-ghost" onclick="addRule()" style="margin-top:8px;width:100%;padding:12px;">+ Nova Regra</button>
+  </div>
+
+  <!-- CAMPAIGN STATUS -->
+  <div class="section">
+    <div class="section-title"><span>📊</span> Status das Campanhas <span id="last-check-lbl" style="color:var(--dim);font-size:10px;font-family:monospace;letter-spacing:0;text-transform:none;margin-left:4px;"></span></div>
+    <div id="camps-section">
+      <div class="empty"><div class="ico">⬡</div><p>Clique em "Verificar Agora" para carregar campanhas e aplicar regras.</p></div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="section">
+    <div class="section-title" style="justify-content:space-between">
+      <span><span style="color:var(--acc)">📋</span> Log de Ações</span>
+      <button class="btn-ghost btn-sm" onclick="clearLog()">Limpar</button>
+    </div>
+    <div id="log-list"><div class="empty"><div class="ico">📋</div><p>Nenhuma ação registrada ainda.</p></div></div>
+  </div>
+
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────
+const TOKEN = localStorage.getItem("meta_token") || "EAAK0fWGyBnYBRG3xqqnYOPMKLZAakYeAR763z0fUlz63MZCRGYmtLhDZCcWZCxNJbcZAWKLl289LbuAqwiorLzFqhQo00qg9bZCZC4FO9so0ZBbLCSRGowY42GBcHMPg8WLKjacVrML9PpZA9ZAZB8N0lhwqrzSWK5rk1NUATFuGPG3WFWWJBfVNU6s81Lgh9cPgZDZD";
+const ACT   = localStorage.getItem("meta_act")   || "act_604987865349440";
+const INS_FIELDS = "spend,impressions,clicks,ctr,cpc,cpm,actions,cost_per_action_type,frequency";
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let rules = JSON.parse(localStorage.getItem("bp-rules-v2") || "[]");
+let actionLog = JSON.parse(localStorage.getItem("bp-log-v2") || "[]");
+let safeMode = true;
+let autoTimer = null;
+
+// Default rules
+if (!rules.length) {
+  rules = [
+    { id:1, name:"Pausar se CPA crítico", enabled:true, scope:"all",
+      metric:"cpa", operator:">", threshold:200, action:"PAUSE", budgetPct:null,
+      cooldown:60, lastFired:null },
+    { id:2, name:"Alerta frequência alta", enabled:true, scope:"all",
+      metric:"frequency", operator:">", threshold:4, action:"ALERT", budgetPct:null,
+      cooldown:30, lastFired:null },
+    { id:3, name:"Escalar se CTR excelente", enabled:false, scope:"all",
+      metric:"ctr", operator:">", threshold:2.5, action:"SCALE", budgetPct:20,
+      cooldown:120, lastFired:null },
+    { id:4, name:"Reduzir budget CPM alto", enabled:true, scope:"all",
+      metric:"cpm", operator:">", threshold:80, action:"REDUCE", budgetPct:20,
+      cooldown:60, lastFired:null },
+  ];
+  saveRules();
+}
+
+// ── PERSIST ───────────────────────────────────────────────────────────────
+function saveRules() { localStorage.setItem("bp-rules-v2", JSON.stringify(rules)); }
+function saveLog()   { localStorage.setItem("bp-log-v2",   JSON.stringify(actionLog.slice(0,200))); }
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+const fmtR  = n => n==null?"—":`R$ ${Number(n).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+const fmtP  = n => n==null?"—":`${Number(n).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})}%`;
+const fmtN  = n => n==null?"—":Number(n).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const now   = () => new Date().toLocaleTimeString("pt-BR");
+const nowFull = () => new Date().toLocaleString("pt-BR");
+
+function getAction(ins, type) {
+  const acts = ins?.data?.[0]?.actions;
+  return acts?.find(x=>x.action_type===type) ? Number(acts.find(x=>x.action_type===type).value) : null;
+}
+function getCPA(ins, type) {
+  const cpa = ins?.data?.[0]?.cost_per_action_type;
+  return cpa?.find(x=>x.action_type===type) ? Number(cpa.find(x=>x.action_type===type).value) : null;
+}
+function getCampMetric(ins, metric) {
+  const d = ins?.data?.[0];
+  if (!d) return null;
+  if (metric==="cpa")       return getCPA({data:[d]},"purchase") || getCPA({data:[d]},"lead");
+  if (metric==="purchases")  return getAction({data:[d]},"purchase");
+  if (metric==="leads")      return getAction({data:[d]},"lead");
+  return d[metric] ? Number(d[metric]) : null;
+}
+function metricLabel(m) {
+  return {cpa:"CPA",cpc:"CPC",cpm:"CPM",ctr:"CTR (%)",frequency:"Frequência",
+    spend:"Gasto (R$)",purchases:"Compras",leads:"Leads"}[m]||m;
+}
+function actionLabel(a) {
+  return {PAUSE:"⏸ Pausar",ACTIVATE:"▶ Ativar",REDUCE:"↓ Reduzir Budget",SCALE:"↑ Escalar Budget",ALERT:"🔔 Alertar"}[a]||a;
+}
+function evaluate(val, op, thresh) {
+  if (val==null) return false;
+  if (op===">")  return val > thresh;
+  if (op==="<")  return val < thresh;
+  if (op===">=") return val >= thresh;
+  if (op==="<=") return val <= thresh;
+  return false;
+}
+
+// ── API ───────────────────────────────────────────────────────────────────
+async function mGet(path, extra={}) {
+  const params = new URLSearchParams({ path, token:TOKEN, ...extra });
+  const r = await fetch(`/api/meta?${params}`);
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d;
+}
+async function mPost(path, fields={}) {
+  const r = await fetch("/api/meta", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ path, token:TOKEN, ...fields })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d;
+}
+
+// ── EXECUTE ACTION ────────────────────────────────────────────────────────
+async function executeAction(camp, rule) {
+  const isSafe = document.getElementById("safe-mode").checked;
+  const label = actionLabel(rule.action);
+
+  if (isSafe) {
+    addLog("🔵", rule.action, `[SIMULADO] ${label} em "${camp.name}"`,
+      `Regra: ${rule.name} | Modo seguro ativo — nenhuma mudança real`);
+    return { simulated:true };
+  }
+
+  try {
+    if (rule.action === "PAUSE") {
+      await mPost(camp.id, { status:"PAUSED" });
+      addLog("⏸", "PAUSE", `Pausado: "${camp.name}"`, `Regra: ${rule.name}`);
+
+    } else if (rule.action === "ACTIVATE") {
+      await mPost(camp.id, { status:"ACTIVE" });
+      addLog("▶", "ACTIVATE", `Ativado: "${camp.name}"`, `Regra: ${rule.name}`);
+
+    } else if (rule.action === "REDUCE" && camp.daily_budget) {
+      const cur  = Number(camp.daily_budget);
+      const pct  = rule.budgetPct || 20;
+      const novo = Math.round(cur * (1 - pct/100));
+      const min  = 100; // R$1 mínimo em centavos
+      if (novo < min) { addLog("⚠️","REDUCE",`Budget mínimo atingido em "${camp.name}"`,`Não reduzido`); return; }
+      await mPost(camp.id, { daily_budget: novo });
+      addLog("↓","REDUCE",`Budget reduzido em "${camp.name}"`,
+        `De ${fmtR(cur/100)} → ${fmtR(novo/100)} (−${pct}%) | Regra: ${rule.name}`);
+
+    } else if (rule.action === "SCALE" && camp.daily_budget) {
+      const cur  = Number(camp.daily_budget);
+      const pct  = rule.budgetPct || 20;
+      const novo = Math.round(cur * (1 + pct/100));
+      await mPost(camp.id, { daily_budget: novo });
+      addLog("↑","SCALE",`Budget escalado em "${camp.name}"`,
+        `De ${fmtR(cur/100)} → ${fmtR(novo/100)} (+${pct}%) | Regra: ${rule.name}`);
+
+    } else if (rule.action === "ALERT") {
+      addLog("🔔","ALERT",`Alerta: "${camp.name}"`,
+        `Regra: ${rule.name} disparada | Ação manual necessária`);
+    }
+
+    rule.lastFired = Date.now();
+    saveRules();
+  } catch(e) {
+    addLog("❌","ERROR",`Erro em "${camp.name}"`,e.message);
+  }
+}
+
+// ── RUN CHECK ─────────────────────────────────────────────────────────────
+async function runCheck() {
+  const btn = document.getElementById("btn-check");
+  btn.disabled = true; btn.textContent = "⏳ Verificando...";
+  setStatus("checking","Verificando campanhas...");
+
+  const dp = document.getElementById("date-preset").value;
+
+  try {
+    const campsR = await mGet(`${ACT}/campaigns`, {
+      fields:`id,name,status,objective,daily_budget,lifetime_budget,insights.date_preset(${dp}){${INS_FIELDS}}`,
+      limit:50
+    });
+    const camps = campsR.data || [];
+
+    renderCampsTable(camps);
+    await applyRules(camps);
+
+    const t = nowFull();
+    document.getElementById("last-check-lbl").textContent = `· última verificação: ${t}`;
+    setStatus("on",`✓ Verificação concluída — ${camps.length} campanha(s) analisada(s)`);
+    addLog("✓","CHECK",`Verificação concluída`,`${camps.length} campanhas · ${rules.filter(r=>r.enabled).length} regras ativas · ${now()}`);
+  } catch(e) {
+    setStatus("off",`Erro: ${e.message}`);
+    addLog("❌","ERROR","Erro na verificação",e.message);
+  }
+
+  btn.disabled = false; btn.textContent = "▶ Verificar Agora";
+}
+
+// ── APPLY RULES ───────────────────────────────────────────────────────────
+async function applyRules(camps) {
+  const active = rules.filter(r=>r.enabled);
+  if (!active.length) return;
+
+  for (const camp of camps) {
+    const ins = camp.insights;
+    for (const rule of active) {
+      // Cooldown check
+      if (rule.lastFired) {
+        const elapsed = (Date.now() - rule.lastFired) / 60000;
+        if (elapsed < rule.cooldown) continue;
+      }
+
+      const val = getCampMetric(ins, rule.metric);
+      if (!evaluate(val, rule.operator, rule.threshold)) continue;
+
+      await executeAction(camp, rule);
+      await new Promise(r=>setTimeout(r,200)); // small delay between actions
+    }
+  }
+}
+
+// ── RENDER TABLE ──────────────────────────────────────────────────────────
+function renderCampsTable(camps) {
+  if (!camps.length) {
+    document.getElementById("camps-section").innerHTML = `<div class="empty"><div class="ico">📭</div><p>Nenhuma campanha encontrada na conta.</p></div>`;
+    return;
+  }
+
+  const dp = document.getElementById("date-preset").value;
+  const STATUS_COLOR = {ACTIVE:"#5bad85",PAUSED:"#d4956a",ARCHIVED:"#555"};
+  const STATUS_LBL   = {ACTIVE:"Ativo",PAUSED:"Pausado",ARCHIVED:"Arquivado"};
+
+  function chipVal(val, metric) {
+    if (val==null) return `<span class="metric-chip chip-na">sem dados</span>`;
+    const activeRules = rules.filter(r=>r.enabled && r.metric===metric);
+    let cls = "chip-ok";
+    for (const r of activeRules) {
+      if (evaluate(val, r.operator, r.threshold)) { cls = r.action==="ALERT"||r.action==="PAUSE"?"chip-bad":"chip-warn"; break; }
+    }
+    const disp = (metric==="cpa"||metric==="cpc"||metric==="cpm"||metric==="spend") ? fmtR(val)
+               : metric==="ctr" ? fmtP(val)
+               : fmtN(val);
+    return `<span class="metric-chip ${cls}">${disp}</span>`;
+  }
+
+  let html = `<div style="overflow-x:auto"><table id="camps-table">
+    <thead><tr>
+      <th>Campanha</th><th>Status</th><th>Budget/dia</th>
+      <th>Gasto</th><th>CPA</th><th>CTR</th><th>CPM</th><th>Freq.</th><th>Ação</th>
+    </tr></thead><tbody>`;
+
+  for (const c of camps) {
+    const ins = c.insights;
+    const d   = ins?.data?.[0];
+    const spend = d?.spend ? Number(d.spend) : null;
+    const cpa   = getCampMetric(ins,"cpa");
+    const ctr   = d?.ctr ? Number(d.ctr) : null;
+    const cpm   = d?.cpm ? Number(d.cpm) : null;
+    const freq  = d?.frequency ? Number(d.frequency) : null;
+    const bdg   = c.daily_budget ? fmtR(Number(c.daily_budget)/100) : c.lifetime_budget ? fmtR(Number(c.lifetime_budget)/100)+" (total)" : "—";
+    const sCol  = STATUS_COLOR[c.status]||"#555";
+
+    // Check which rules fire for this camp
+    const firing = rules.filter(r=>r.enabled && evaluate(getCampMetric(ins,r.metric),r.operator,r.threshold));
+
+    html += `<tr>
+      <td style="max-width:200px;"><div style="font-size:12.5px;line-height:1.3;">${c.name}</div>
+        ${firing.length?`<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;">${firing.map(r=>`<span class="action-tag action-${r.action}" style="font-size:9.5px;">${actionLabel(r.action)}</span>`).join("")}</div>`:""}</td>
+      <td><span style="font-size:11px;font-family:monospace;color:${sCol}">${STATUS_LBL[c.status]||c.status}</span></td>
+      <td style="font-family:monospace;font-size:12px;color:var(--acc)">${bdg}</td>
+      <td>${chipVal(spend,"spend")}</td>
+      <td>${chipVal(cpa,"cpa")}</td>
+      <td>${chipVal(ctr,"ctr")}</td>
+      <td>${chipVal(cpm,"cpm")}</td>
+      <td>${chipVal(freq,"frequency")}</td>
+      <td>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          ${c.status==="ACTIVE"
+            ? `<button class="btn-danger btn-sm" onclick="manualAction('${c.id}','${c.name.replace(/'/g,"\\'")}','PAUSE')">⏸</button>`
+            : `<button class="btn-green btn-sm"  onclick="manualAction('${c.id}','${c.name.replace(/'/g,"\\'")}','ACTIVATE')">▶</button>`}
+        </div>
+      </td>
+    </tr>`;
+  }
+  html += `</tbody></table></div>`;
+  document.getElementById("camps-section").innerHTML = html;
+}
+
+// ── MANUAL ACTION ─────────────────────────────────────────────────────────
+async function manualAction(campId, campName, action) {
+  const isSafe = document.getElementById("safe-mode").checked;
+  if (isSafe) {
+    addLog("🔵",action,`[SIMULADO] ${actionLabel(action)} em "${campName}"`,`Ação manual · Modo seguro ativo`);
+    alert(`Modo Seguro ativo. Desative para executar a ação real.`);
+    return;
+  }
+  if (!confirm(`Confirma: ${actionLabel(action)} em "${campName}"?`)) return;
+  try {
+    const status = action==="PAUSE"?"PAUSED":"ACTIVE";
+    await mPost(campId, { status });
+    addLog(action==="PAUSE"?"⏸":"▶", action, `${actionLabel(action)}: "${campName}"`, `Ação manual`);
+    runCheck();
+  } catch(e) { addLog("❌","ERROR",`Erro em "${campName}"`,e.message); }
+}
+
+// ── LOG ───────────────────────────────────────────────────────────────────
+function addLog(icon, type, msg, detail="") {
+  const entry = { icon, type, msg, detail, time:nowFull() };
+  actionLog.unshift(entry);
+  actionLog = actionLog.slice(0,200);
+  saveLog();
+  renderLog();
+}
+function renderLog() {
+  if (!actionLog.length) {
+    document.getElementById("log-list").innerHTML = `<div class="empty"><div class="ico">📋</div><p>Nenhuma ação registrada ainda.</p></div>`;
+    return;
+  }
+  const typeColor = {PAUSE:"#e07070",ACTIVATE:"#5bad85",REDUCE:"#d4956a",SCALE:"#6a8eb5",ALERT:"#9b7dbf",CHECK:"#555",ERROR:"#e07070"};
+  document.getElementById("log-list").innerHTML = actionLog.map(e=>`
+    <div class="log-entry fade">
+      <div class="log-icon">${e.icon}</div>
+      <div class="log-body">
+        <div class="log-time">${e.time} <span style="color:${typeColor[e.type]||"#555"};margin-left:4px;font-size:10px;">${e.type}</span></div>
+        <div class="log-msg">${e.msg}</div>
+        ${e.detail?`<div class="log-detail">${e.detail}</div>`:""}
+      </div>
+    </div>`).join("");
+}
+function clearLog() {
+  if (!confirm("Limpar todo o log?")) return;
+  actionLog = []; saveLog(); renderLog();
+}
+
+// ── STATUS ────────────────────────────────────────────────────────────────
+function setStatus(state, msg) {
+  const dot = document.getElementById("pulse-dot");
+  const txt = document.getElementById("status-txt");
+  dot.className = "pulse" + (state==="on"?" on":state==="checking"?" checking":"");
+  txt.textContent = msg;
+  txt.style.color = state==="on"?"#5bad85":state==="checking"?"#d4c06a":"var(--dim)";
+}
+
+// ── SAFE MODE ─────────────────────────────────────────────────────────────
+function toggleSafeMode() {
+  const on = document.getElementById("safe-mode").checked;
+  document.getElementById("safe-bar").style.display = on?"flex":"none";
+  if (!on && !confirm("⚠️ Desativar Modo Seguro?\n\nAs próximas verificações vão EXECUTAR AÇÕES REAIS na conta Meta Ads (pausar campanhas, alterar budgets).\n\nConfirmar?")) {
+    document.getElementById("safe-mode").checked = true;
+    document.getElementById("safe-bar").style.display = "flex";
+  }
+}
+
+// ── AUTO RUN ──────────────────────────────────────────────────────────────
+function setAutoRun() {
+  clearInterval(autoTimer);
+  const mins = parseInt(document.getElementById("auto-interval").value);
+  if (!mins) { setStatus("off","Monitor automático desligado"); return; }
+  autoTimer = setInterval(runCheck, mins*60000);
+  setStatus("on",`Monitor automático: verificando a cada ${mins} min`);
+  addLog("⚙️","AUTO",`Monitor automático ativado`,`Intervalo: ${mins} minutos`);
+}
+
+// ── RULES UI ──────────────────────────────────────────────────────────────
+const METRICS = ["cpa","cpc","cpm","ctr","frequency","spend","leads","purchases"];
+const OPERATORS = [{v:">",l:"maior que"},{v:"<",l:"menor que"},{v:">=",l:"≥"},{v:"<=",l:"≤"}];
+const ACTIONS = ["PAUSE","ACTIVATE","REDUCE","SCALE","ALERT"];
+
+function addRule() {
+  rules.push({ id:Date.now(), name:"Nova Regra", enabled:true, scope:"all",
+    metric:"cpa", operator:">", threshold:100, action:"ALERT", budgetPct:20, cooldown:30, lastFired:null });
+  saveRules(); renderRules();
+}
+
+function deleteRule(id) {
+  if (!confirm("Remover regra?")) return;
+  rules = rules.filter(r=>r.id!==id); saveRules(); renderRules();
+}
+
+function updateRule(id, field, value) {
+  const r = rules.find(r=>r.id===id);
+  if (!r) return;
+  if (field==="threshold"||field==="budgetPct"||field==="cooldown") value=Number(value);
+  if (field==="enabled") value = value==="true"||value===true;
+  r[field] = value;
+  saveRules();
+}
+
+function renderRules() {
+  const el = document.getElementById("rules-list");
+  if (!rules.length) {
+    el.innerHTML = `<div class="empty"><div class="ico">⚡</div><p>Nenhuma regra criada. Clique em "+ Nova Regra".</p></div>`;
+    return;
+  }
+
+  el.innerHTML = rules.map(r=>`
+    <div class="rule-card ${r.enabled?"active-rule":"inactive-rule"} fade" id="rc-${r.id}">
+      <div class="rule-header">
+        <label class="toggle">
+          <input type="checkbox" ${r.enabled?"checked":""} onchange="updateRule(${r.id},'enabled',this.checked);renderRules()">
+          <div class="toggle-slider"></div>
+        </label>
+        <input value="${r.name}" style="flex:1;background:transparent;border:none;border-bottom:1px solid var(--brd2);border-radius:0;font-size:13.5px;color:var(--txt);padding:4px 0;"
+          onchange="updateRule(${r.id},'name',this.value)"/>
+        <span class="action-tag action-${r.action}">${actionLabel(r.action)}</span>
+        <button class="btn-danger btn-sm" onclick="deleteRule(${r.id})">✕</button>
+      </div>
+      <div class="rule-grid">
+        <div class="rule-field">
+          <label>Métrica</label>
+          <select onchange="updateRule(${r.id},'metric',this.value);renderRules()">
+            ${METRICS.map(m=>`<option value="${m}" ${r.metric===m?"selected":""}>${metricLabel(m)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="rule-field">
+          <label>Condição</label>
+          <select onchange="updateRule(${r.id},'operator',this.value)">
+            ${OPERATORS.map(o=>`<option value="${o.v}" ${r.operator===o.v?"selected":""}>${o.l}</option>`).join("")}
+          </select>
+        </div>
+        <div class="rule-field">
+          <label>Valor limite</label>
+          <input type="number" value="${r.threshold}" min="0" step="0.1"
+            onchange="updateRule(${r.id},'threshold',this.value)"
+            placeholder="${r.metric==="ctr"?"ex: 1.5":r.metric==="frequency"?"ex: 4":"ex: 150"}"/>
+        </div>
+        <div class="rule-field">
+          <label>Ação</label>
+          <select onchange="updateRule(${r.id},'action',this.value);renderRules()">
+            ${ACTIONS.map(a=>`<option value="${a}" ${r.action===a?"selected":""}>${actionLabel(a)}</option>`).join("")}
+          </select>
+        </div>
+        ${["REDUCE","SCALE"].includes(r.action)?`
+        <div class="rule-field">
+          <label>${r.action==="REDUCE"?"Reduzir (%)":"Escalar (%)"}</label>
+          <input type="number" value="${r.budgetPct||20}" min="5" max="100" step="5"
+            onchange="updateRule(${r.id},'budgetPct',this.value)"/>
+        </div>`:""}
+        <div class="rule-field">
+          <label>Cooldown (min)</label>
+          <input type="number" value="${r.cooldown||30}" min="5" step="5"
+            onchange="updateRule(${r.id},'cooldown',this.value)"/>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--dim2);font-family:monospace;padding:8px 0 0;border-top:1px solid #141414;">
+        SE <span style="color:var(--acc)">${metricLabel(r.metric)}</span> ${r.operator} <span style="color:var(--txt)">${r.threshold}${r.metric==="ctr"?"%":r.metric==="frequency"?"x":r.metric.includes("cpa")||r.metric.includes("cpc")||r.metric.includes("cpm")||r.metric==="spend"?" R$":""}</span>
+        → <span style="color:${r.action==="PAUSE"?"#e07070":r.action==="SCALE"?"#6a8eb5":r.action==="REDUCE"?"#d4956a":r.action==="ACTIVATE"?"#5bad85":"#9b7dbf"}">${actionLabel(r.action)}${["REDUCE","SCALE"].includes(r.action)?" "+r.budgetPct+"%":""}</span>
+        · Cooldown: ${r.cooldown} min
+        ${r.lastFired?`· Último disparo: ${new Date(r.lastFired).toLocaleString("pt-BR")}`:"· Nunca disparou"}
+      </div>
+    </div>`).join("");
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+renderRules();
+renderLog();
+document.getElementById("safe-bar").style.display = "flex";
+document.getElementById("date-preset").addEventListener("change", ()=>{ if(document.getElementById("camps-section").querySelector("table")) runCheck(); });
+</script>
+</body>
+</html>
